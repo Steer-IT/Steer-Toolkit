@@ -1,6 +1,6 @@
 // Steer IT Security Toolkit: keeps the app itself available offline.
 // Checks (breach, DNS, speed and so on) always go to the live services and are never cached.
-const CACHE = "steer-toolkit-v2";
+const CACHE = "steer-toolkit-v3";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -14,7 +14,7 @@ self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET" || url.origin !== self.location.origin) return; // leave live checks alone
   // Network first so updates appear straight away; fall back to the cached copy when offline
   e.respondWith(
-    fetch(e.request).then((res) => {
+    fetch(e.request, { cache: "no-cache" }).then((res) => {
       const copy = res.clone();
       caches.open(CACHE).then((c) => c.put(e.request, copy));
       return res;
