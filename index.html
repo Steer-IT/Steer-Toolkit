@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>Steer IT Security Toolkit</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Free security checks from Steer IT: email breaches, email domain spoofing protection, leaked passwords, website security, DNS records and internet speed.">
+<meta name="description" content="Free security and IT checks from Steer IT: service status, full domain report, saved domains, record builder, blacklist check, email breaches, email domain spoofing protection, leaked passwords, website security, DNS records, domain and certificate expiry, and internet speed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -86,7 +86,7 @@ nav.tabbar { display: none; }
   .brandbar .apptitle { display: block; }
   nav.tools { display: none; }
   nav.tabbar {
-    display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     background: var(--surface); border-top: 1px solid var(--line);
     padding: 6px max(6px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
@@ -325,6 +325,146 @@ table.rtable { width: 100%; border-collapse: collapse; font-size: 13px; }
 }
 .btn2 { font: inherit; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--accent); cursor: pointer; }
 
+/* Share, report, expiry */
+.sharebtn { align-self: flex-start; margin-top: 6px; font: inherit; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--accent); cursor: pointer; }
+.sharebtn svg { width: 15px; height: 15px; }
+.secs { display: flex; flex-direction: column; }
+.sec-row { display: grid; grid-template-columns: minmax(0, 1fr) 54px auto; gap: 6px 14px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+.sec-row:first-child { border-top: 0; padding-top: 4px; }
+.sec-row .nm { font-weight: 600; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sec-row .nm small { font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.sec-row .t { height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
+.sec-row .t i { display: block; height: 100%; width: 0; border-radius: inherit; transition: width .8s cubic-bezier(.2,.8,.2,1); }
+.sec-row .sc { font-family: var(--font-display); font-weight: 700; font-size: 22px; text-align: right; font-variant-numeric: tabular-nums; }
+.sec-row .sc.na { font-size: 13px; color: var(--muted); font-family: var(--font-body); font-weight: 500; }
+.sec-row button { font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; cursor: pointer; white-space: nowrap; }
+@media (max-width: 520px) { .sec-row { grid-template-columns: minmax(0, 1fr) auto; } .sec-row button { grid-column: 1 / -1; justify-self: start; } }
+.lettergrade { width: 150px; max-width: 100%; }
+.lettergrade text { font-family: var(--font-display); fill: var(--ink); }
+.lettergrade .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; fill: var(--muted); }
+.countdowns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+@media (max-width: 600px) { .countdowns { grid-template-columns: 1fr; } }
+.cd { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: center; }
+.cd svg { width: 112px; height: 112px; }
+.cd svg text { font-family: var(--font-display); fill: var(--ink); }
+.cd svg .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; fill: var(--muted); }
+.cd .cap { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.cd b { display: block; font-family: var(--font-display); font-size: 21px; line-height: 1.2; margin: 4px 0; overflow-wrap: anywhere; }
+.cd span { font-size: 13px; color: var(--muted); }
+dl.kv { display: grid; grid-template-columns: minmax(110px, auto) minmax(0, 1fr); gap: 8px 16px; margin: 0; font-size: 14px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+dl.kv dd code { font-family: var(--font-mono); font-size: 12.5px; }
+@media (max-width: 460px) { dl.kv { grid-template-columns: 1fr; gap: 2px; } dl.kv dd { margin-bottom: 8px; } }
+
+/* Builder, saved domains, blacklist, generator */
+.group-h { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 10px 0 -8px; }
+.opts { display: flex; flex-direction: column; gap: 16px; }
+.checks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.cbox { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); cursor: pointer; font-size: 14px; font-weight: 500; }
+.cbox input { accent-color: var(--steer-blue); width: 18px; height: 18px; margin: 1px 0 0; flex: 0 0 auto; }
+.cbox span { min-width: 0; }
+.cbox small { display: block; font-weight: 400; color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; overflow-wrap: anywhere; margin-top: 2px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.field2 { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field2 > label { font-size: 13px; font-weight: 600; }
+.field2 input, .field2 select, .field2 textarea { font: inherit; font-size: 14px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); min-width: 0; width: 100%; }
+.field2 textarea { font-family: var(--font-mono); font-size: 12.5px; resize: vertical; }
+.fields2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.recout { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 12px; }
+.recout .r { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 12px; border-top: 1px solid var(--line); }
+.recout .r:first-child { border-top: 0; }
+.recout .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.recout code { font-family: var(--font-mono); font-size: 13px; overflow-wrap: anywhere; word-break: break-all; white-space: pre-wrap; }
+.copybtn { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--accent); background: var(--surface); border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+.copybtn:disabled { opacity: .6; }
+.note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.warnnote { color: var(--warn); }
+.current { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: var(--info-bg); font-size: 13px; overflow-wrap: anywhere; }
+.current code { font-family: var(--font-mono); font-size: 12.5px; white-space: pre-wrap; word-break: break-all; }
+.wlist { display: flex; flex-direction: column; }
+.wrow { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.wrow:first-child { border-top: 0; padding-top: 4px; }
+.wgrade { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 22px; border: 4px solid var(--gc); color: var(--gc); }
+.wmid { min-width: 0; }
+.wrow .dn { font-weight: 600; font-size: 16px; overflow-wrap: anywhere; }
+.wrow .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.wrow .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 560px) { .wrow { grid-template-columns: 52px minmax(0, 1fr); } .wrow .acts { grid-column: 1 / -1; justify-content: flex-start; } }
+.bl-ip { padding: 14px 0; border-top: 1px solid var(--line); }
+.bl-ip:first-of-type { border-top: 0; }
+.bl-ip h4 { margin: 0; font-family: var(--font-mono); font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.bl-ip small { color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.bl-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.gen { display: flex; flex-direction: column; gap: 14px; }
+.genout { font-family: var(--font-mono); font-size: 19px; line-height: 1.4; padding: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; overflow-wrap: anywhere; word-break: break-all; user-select: all; -webkit-user-select: all; }
+.genrow { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; font-size: 14px; }
+.genrow input[type=range] { accent-color: var(--steer-blue); flex: 1 1 160px; min-width: 0; }
+.genrow .val { font-family: var(--font-mono); font-size: 13px; min-width: 70px; }
+.genrow label.tg { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+.genrow label.tg input { accent-color: var(--steer-blue); width: 18px; height: 18px; margin: 0; }
+.btnp { font: inherit; font-weight: 600; font-size: 14px; padding: 10px 16px; border-radius: 9px; border: 0; background: var(--steer-cyan); color: #06233a; cursor: pointer; }
+
+/* Service status */
+.svcs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .svcs { grid-template-columns: 1fr; } }
+.svc { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--sc, var(--line)); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.svc.lv-ok { --sc: var(--good); } .svc.lv-minor { --sc: var(--warn); } .svc.lv-maint { --sc: var(--info); }
+.svc.lv-major, .svc.lv-critical { --sc: var(--bad); background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 45%, transparent); border-left-color: var(--bad); }
+.svc-h { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.svc-h .avatar { width: 40px; height: 40px; font-size: 15px; }
+.svc-n { min-width: 0; display: flex; flex-direction: column; }
+.svc-n b { font-size: 16px; }
+.svc-n span { font-size: 12.5px; color: var(--muted); }
+.svc-d { margin: 0; font-size: 14px; color: var(--muted); }
+.incs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.incs li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; display: flex; flex-direction: column; gap: 4px; }
+.inc-top { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; justify-content: space-between; }
+.inc-top b { font-weight: 600; }
+.inc-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.incs p { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+.incs a, .svc-links a { font-size: 13px; font-weight: 600; text-decoration: none; }
+.svc-links { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+@media (max-width: 420px) { .svc-h { grid-template-columns: 40px minmax(0, 1fr); } .svc-h .pill { grid-column: 2; justify-self: start; } }
+.alert-banner { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; padding: 14px 16px; border-radius: 14px; text-decoration: none; color: var(--ink); background: var(--bad-bg); border: 1px solid color-mix(in srgb, var(--bad) 45%, transparent); }
+.alert-banner.minor { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+.alert-banner b { color: var(--bad); font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; display: block; }
+.alert-banner.minor b { color: var(--warn); }
+.alert-banner span { font-weight: 600; }
+.alert-banner em { font-style: normal; font-weight: 600; color: var(--accent); white-space: nowrap; }
+a.alert-major, a.alert-minor { position: relative; }
+nav.tabbar a.alert-major::after, nav.tabbar a.alert-minor::after { content: ""; position: absolute; top: 3px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: var(--bad); box-shadow: 0 0 0 2px var(--surface); }
+nav.tabbar a.alert-minor::after { background: var(--warn); }
+nav.tools a.alert-major::after, nav.tools a.alert-minor::after { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #d23a26; margin-left: 6px; vertical-align: 2px; }
+nav.tools a.alert-minor::after { background: #b26a00; }
+
+/* Dashboard sections */
+.sections { display: flex; flex-direction: column; gap: 12px; max-width: 760px; width: 100%; margin: 0 auto; }
+.section { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: border-color .2s; }
+.section.open { border-color: var(--steer-cyan); }
+.sec-btn { width: 100%; font: inherit; color: inherit; background: none; border: 0; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto 24px; gap: 14px; align-items: center; padding: 16px; text-align: left; }
+.sec-btn .art { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(140deg, var(--hero-2), var(--hero)); display: grid; place-items: center; }
+.sec-btn .art svg { width: 34px; height: 34px; }
+.sec-txt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sec-txt b { font-family: var(--font-display); font-size: 20px; line-height: 1.2; }
+.sec-txt span { font-size: 13.5px; color: var(--muted); }
+.sec-count { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.chev { width: 24px; height: 24px; color: var(--accent); transition: transform .2s; }
+.chev svg { width: 24px; height: 24px; }
+.section.open .chev { transform: rotate(180deg); }
+.sec-list { border-top: 1px solid var(--line); }
+.tool-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) 16px; gap: 12px; align-items: center; padding: 12px 16px; text-decoration: none; color: inherit; border-top: 1px solid var(--line); }
+.tool-row:first-child { border-top: 0; }
+.tool-row:hover { background: var(--bg); }
+.tool-row .art.sm { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(140deg, var(--hero-2), var(--hero)); display: grid; place-items: center; }
+.tool-row .art.sm svg { width: 25px; height: 25px; }
+.tr-txt { min-width: 0; display: flex; flex-direction: column; }
+.tr-txt b { font-weight: 600; font-size: 15.5px; }
+.tr-txt span { font-size: 13px; color: var(--muted); }
+.tr-go { font-size: 24px; line-height: 1; color: var(--muted); }
+@media (max-width: 460px) { .sec-btn { grid-template-columns: 48px minmax(0, 1fr) 24px; gap: 12px; padding: 14px; } .sec-btn .art { width: 48px; height: 48px; } .sec-count { display: none; } .sec-txt b { font-size: 18px; } }
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+
 footer .inner { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-block: 18px 40px; display: flex; flex-direction: column; gap: 6px; }
 footer a { color: inherit; }
 @media (prefers-reduced-motion: reduce) { .dial .sweep, .spinner { animation-duration: 6s; } .bar-row .t i, .tool-card { transition: none; } }
@@ -339,11 +479,17 @@ footer a { color: inherit; }
     <span class="apptitle">Security Toolkit</span>
     <nav class="tools" aria-label="Security tools">
       <a href="#home" data-route="home">Dashboard</a>
+      <a href="#report" data-route="report">Full report</a>
+      <a href="#watch" data-route="watch">My domains</a>
+      <a href="#status" data-route="status">Service status</a>
       <a href="#breach" data-route="breach">Breach check</a>
       <a href="#domain" data-route="domain">Email security</a>
       <a href="#password" data-route="password">Password check</a>
       <a href="#website" data-route="website">Website scan</a>
       <a href="#dns" data-route="dns">DNS lookup</a>
+      <a href="#expiry" data-route="expiry">Expiry check</a>
+      <a href="#blacklist" data-route="blacklist">Blacklists</a>
+      <a href="#builder" data-route="builder">Record builder</a>
       <a href="#speed" data-route="speed">Speed test</a>
     </nav>
   </div>
@@ -351,11 +497,9 @@ footer a { color: inherit; }
 
 <nav class="tabbar" aria-label="Tools">
   <a href="#home" data-route="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Home</span></a>
-  <a href="#breach" data-route="breach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6.5L20.5 7"/></svg><span>Breach</span></a>
-  <a href="#domain" data-route="domain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8 3.2v5.8c0 5-3.3 8.6-8 10.5-4.7-1.9-8-5.5-8-10.5V5.7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Email</span></a>
-  <a href="#password" data-route="password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/></svg><span>Password</span></a>
-  <a href="#website" data-route="website"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="16" rx="2"/><path d="M2.5 8.5h19"/></svg><span>Website</span></a>
-  <a href="#dns" data-route="dns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.7 2.6 4 5.6 4 9s-1.3 6.4-4 9c-2.7-2.6-4-5.6-4-9s1.3-6.4 4-9z"/></svg><span>DNS</span></a>
+  <a href="#report" data-route="report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="2.5" width="15" height="19" rx="2"/><path d="M8 7.5h8M8 11.5h5M8.5 16l2 2 4-4"/></svg><span>Report</span></a>
+  <a href="#watch" data-route="watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h12a1 1 0 011 1v16l-7-4-7 4v-16a1 1 0 011-1z"/></svg><span>Domains</span></a>
+  <a href="#status" data-route="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l2.5-6 4 12 2.5-6h6"/></svg><span>Status</span></a>
   <a href="#speed" data-route="speed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 17a8.5 8.5 0 1117 0"/><path d="M12 17l4.5-5.5"/></svg><span>Speed</span></a>
 </nav>
 
@@ -435,10 +579,47 @@ footer a { color: inherit; }
     return svg;
   }
 
+  let PREFILL = null;   // { route, value } handed from the full report to a tool
+  let current = null;
+  const TITLES = { home: "Security Toolkit", report: "Full domain report", breach: "Breach check", domain: "Email security check", password: "Password check", website: "Website scan", dns: "DNS lookup", expiry: "Domain and certificate expiry", speed: "Speed test", builder: "DNS record builder", blacklist: "Blacklist check", watch: "My domains", status: "Service status" };
+  function takePrefill(route) { if (PREFILL && PREFILL.route === route) { const v = PREFILL.value; PREFILL = null; return v; } return null; }
+
+  // Plain-text summary of whatever result is on screen, for the share sheet
+  function resultText() {
+    const L = [`Steer IT · ${TITLES[current] || "Security Toolkit"}`];
+    const v = out.querySelector(".verdict"); if (!v) return L.join("\n");
+    if (v.querySelector(".example-flag")) L.push("(Example data)");
+    L.push("", v.querySelector("h2").textContent);
+    const p = v.querySelector(".txt > p"); if (p) L.push(p.textContent);
+    const g = v.querySelector("svg[aria-label]"); if (g) L.push(g.getAttribute("aria-label"));
+    const secs = [...out.querySelectorAll(".sec-row, .share-line")]; if (secs.length) { L.push(""); secs.forEach(r => L.push("• " + r.dataset.text)); }
+    const figs = [...out.querySelectorAll(".fig")]; if (figs.length) { L.push(""); figs.forEach(f => L.push(`• ${f.querySelector("b").textContent} ${f.querySelector("span").textContent}`)); }
+    const cds = [...out.querySelectorAll(".cd")]; if (cds.length) { L.push(""); cds.forEach(c => L.push(`• ${c.querySelector(".cap").textContent}: ${c.querySelector("b").textContent}`)); }
+    const checks = [...out.querySelectorAll(".check")]; if (checks.length) { L.push(""); checks.forEach(c => L.push(`[${c.querySelector(".state").textContent}] ${c.querySelector(".name").textContent}`)); }
+    const ents = [...out.querySelectorAll(".entry")]; if (ents.length) { L.push("", "Breaches:"); ents.forEach(e => L.push(`• ${e.querySelector(".name").textContent} (${e.querySelector(".yr").textContent})`)); }
+    L.push("", "Checked with the Steer IT Security Toolkit");
+    if (/^https:/.test(location.href) && !/claude/i.test(location.host)) L.push(location.href.split("#")[0] + "#" + current);
+    L.push("Steer IT Solutions · " + BRAND.ctaLink.replace(/^https?:\/\//, ""));
+    return L.join("\n");
+  }
+  const SHARE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
+  function shareButton() {
+    const b = el("button", "sharebtn"); b.type = "button"; b.innerHTML = SHARE_ICON; b.append(document.createTextNode("Share result"));
+    const label = (t) => { b.lastChild.textContent = t; };
+    b.addEventListener("click", async () => {
+      const text = resultText(), title = "Steer IT · " + (TITLES[current] || "Security Toolkit");
+      if (navigator.share) { try { await navigator.share({ title, text }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+      try { await navigator.clipboard.writeText(text); label("Copied to clipboard"); }
+      catch { label("Couldn't share here"); }
+      setTimeout(() => label("Share result"), 2200);
+    });
+    return b;
+  }
   function verdict(state, tagText, title, body, isExample, side) {
     const v = el("div", "verdict " + state); const t = el("div", "txt");
     const tag = el("div", "tag", tagText); if (isExample) tag.append(el("span", "example-flag", "Example data"));
     t.append(tag, el("h2", null, title)); if (body) t.append(el("p", null, body));
+    if (state !== "err") t.append(shareButton());
     v.append(t); if (side) v.append(side); return v;
   }
   function figures(items) {
@@ -734,17 +915,23 @@ footer a { color: inherit; }
       out.append(cta("Steer IT can set up SPF, DKIM and DMARC properly, monitor your DMARC reports and take you safely to full enforcement."));
     }
     let busy = false;
+    // Returns the list of checks, or null if the domain doesn't exist. Throws if DNS can't be reached.
+    async function fetchChecks(domain) {
+      const txt = (n) => dns(n, "TXT").then(r => answers(r, "TXT")).catch(() => []);
+      const [base, mx, dmarc, mtasts, tlsrpt, bimi, dkimHits] = await Promise.all([
+        dns(domain, "TXT"), dns(domain, "MX").catch(() => null), txt("_dmarc." + domain), txt("_mta-sts." + domain), txt("_smtp._tls." + domain), txt("default._bimi." + domain),
+        Promise.all(SELECTORS.map(s => dns(s + "._domainkey." + domain, "TXT").then(r => (r && Array.isArray(r.Answer) && r.Answer.some(a => a.type === 5 || /p=/.test(a.data))) ? s : null).catch(() => null)))
+      ]);
+      if (base.Status === 3) return null;
+      return analyse(domain, { txt: answers(base, "TXT"), mx: answers(mx, "MX"), dmarc, mtasts, tlsrpt, bimi, dkim: dkimHits.filter(Boolean), ad: !!base.AD });
+    }
     async function run(domain, btn) {
       if (busy) return; busy = true; btn.disabled = true;
       loading("Reading DNS records for " + domain + "…"); dial.set({ scanning: true });
       try {
-        const txt = (n) => dns(n, "TXT").then(r => answers(r, "TXT")).catch(() => []);
-        const [base, mx, dmarc, mtasts, tlsrpt, bimi, dkimHits] = await Promise.all([
-          dns(domain, "TXT"), dns(domain, "MX").catch(() => null), txt("_dmarc." + domain), txt("_mta-sts." + domain), txt("_smtp._tls." + domain), txt("default._bimi." + domain),
-          Promise.all(SELECTORS.map(s => dns(s + "._domainkey." + domain, "TXT").then(r => (r && Array.isArray(r.Answer) && r.Answer.some(a => a.type === 5 || /p=/.test(a.data))) ? s : null).catch(() => null)))
-        ]);
-        if (base.Status === 3) { dial.set(); return errorBox("That domain doesn't exist", `No DNS records were found for ${domain}. Check the spelling.`); }
-        render(domain, analyse(domain, { txt: answers(base, "TXT"), mx: answers(mx, "MX"), dmarc, mtasts, tlsrpt, bimi, dkim: dkimHits.filter(Boolean), ad: !!base.AD }), false);
+        const checks = await fetchChecks(domain);
+        if (!checks) { dial.set(); return errorBox("That domain doesn't exist", `No DNS records were found for ${domain}. Check the spelling.`); }
+        render(domain, checks, false);
       } catch (e) { dial.set(); errorBox("Couldn't read DNS records", NET_ERR); }
       finally { busy = false; btn.disabled = false; }
     }
@@ -765,8 +952,9 @@ footer a { color: inherit; }
         f.input.value = h; run(h, f.button); });
       render(SAMPLE.domain, sample(), true);
       foot.replaceChildren(el("div", null, "DNS lookups via Google Public DNS, with Cloudflare as a fallback. DKIM is checked against common selectors only, so a custom selector may show as not found."));
+      const pre = takePrefill("domain"); if (pre) { f.input.value = pre; run(pre, f.button); }
     }
-    return { mount };
+    return { mount, fetchChecks, grade, sample };
   })();
 
   // ================= Tool: Password check =================
@@ -774,7 +962,53 @@ footer a { color: inherit; }
     const COMMON = ["123456","password","123456789","12345678","12345","qwerty","qwerty123","1q2w3e4r","111111","123123","abc123","password1","password123","admin","letmein","welcome","welcome1","iloveyou","monkey","dragon","football","baseball","sunshine","princess","shadow","master","superman","trustno1","000000","654321","michael","charlie","freedom","whatever","qazwsx","starwars","liverpool","chelsea","arsenal","cardiff","wales","london","summer","winter","spring","autumn","hello","hello123","changeme","passw0rd","p@ssw0rd","p@ssword","secret","login","access","flower","cheese","computer","internet","ashley","jordan","maggie","hunter","buster","soccer","killer","pepper","daniel","thomas","jessica","matthew","andrew","joshua"];
     const WORDS = ["password","passw0rd","welcome","admin","letmein","qwerty","summer","winter","spring","autumn","monday","friday","january","december","dragon","monkey","football","iloveyou","cardiff","wales","london","company","office","secret","login"];
     const SEQS = ["abcdefghijklmnopqrstuvwxyz", "0123456789", "qwertyuiop", "asdfghjkl", "zxcvbnm"];
-    let dial;
+    let dial, pwInput = null, pwForm = null;
+    const WORDLIST = "abacus abdomen abide abiding ability ablaze able abreast abridge abroad absence absolve abstain absurd accent acclaim account acetone aching acid acorn acquire acre acrobat acronym acting action active actress acts acutely aerosol afar affair affirm affix afford affront aflame afloat afoot afraid aged ageless agency agenda agent aghast agile agility aging agonize agony agreed aground ahead ahoy aide aids ajar alarm album alfalfa algebra alias alibi aliens alike alive almanac almost aloe aloft aloha alone aloof alright alto alumni always amaze amber ambush amends amenity amiable amid amigo amino amiss ammonia amnesty among amount ample amplify amply amuck amulet amused amuser amusing anagram anatomy anchor anchovy ancient android anemia anemic anew angelic anger angled angler angles angling angrily angular animal animate anime ankle annex annuity another antacid anthem anthill antics antler antonym antsy anvil anybody anyhow anymore anyone anytime anyway aorta apache apostle appear appease applaud apple applied apply approve apricot april apron aptly aqua area arena argue arise armband armed armful armhole arming armless armoire armored armory armrest army aroma arose around arousal arrange array arrest arrival arrive arson ascend ascent ashamed ashen ashes ashy aside askew asleep aspect aspire aspirin astound astride astute atlas atom atop atrium atrophy attach attain attempt attest attic attire auction audible audibly audio august author autism avatar avenge avenue average avert aviator avid avoid await awaken award aware awhile awkward awning awoke awry axis babble babied baboon backed backer backing backlit backlog backup bacon badass badge badland badly badness baffle bagel bagful baggage bagged baggie bagging baggy bagpipe baked bakery baking balance balcony balmy bamboo banana banish banjo banked banker banking banner banshee banter barbed barbell barber barcode barge barista barley barmaid barman barn barrack barrel barrier bash basics basil basin basis basket batboy batch bath baton bats battery batting battle bauble bazooka blabber bladder blade blah blame blaming blank blast blazer blazing bleach bleak bleep blemish blend bless blimp bling blinked blinker blinks blip blitz bloated blob blog blooper blot blouse blubber bluff bluish blunt blurb blurred blurry blurt blush boaster boat bobbed bobbing bobble bobcat bobsled bobtail body bogged boggle bogus boil bolster bolt bonanza bonded bonding boned boney bonfire bonnet bonsai bonus bony book booted booth bootie booting bootleg boots boozy borax boring borough boss botany botch both bottle bottom bounce bouncy bovine boxcar boxer boxing boxlike boxy breach breath breeder breeze breezy brewery brewing briar bribe brick bride bridged brigade bright brim bring brink brisket briskly bristle brittle broaden broadly broiler broken broker bronco bronze brook broom brought browse brunch brunt brush brute bubble bubbly bucked bucket buckle budding buddy budget buffalo buffed buffer buffing buffoon buggy bulb bulge bulgur bulk bulldog bullion bullish bullpen bully bunch bundle bungee bunion bunkbed bunny bunt busboy bush busily busload bust buzz cabana cabbage cabbie cable caboose cache cackle cacti cactus caddie caddy cadet cadmium cage cahoots cake calcium caliber calm caloric calorie calzone cameo camera camper camping campus canal canary cancel candied candle candy cane canine canned canning cannon cannot canola canon canopy canteen canyon capable capably cape capital capitol capped capsize capsule caption captive capture caramel carat caravan carbon carded cardiac caress cargo caring carless carload carnage carol carpool carport carried carrot carry cartel carton cartoon carve carving carwash cascade case cash casing casino casket catalog catcall catcher catchy caterer catfish catlike catnap catnip catsup cattail cattle catty catwalk caucus causal cause causing caution cavalry caviar cavity cedar celery celtic cement census certify chafe chain chair chalice chamber chance change channel chant chaos chapped chaps chapter charger chariot charity charm charred charter chase chasing chaste chatter chatty cheddar cheek cheer cheese cheesy chef chemist chemo cherub chess chest chevron chevy chewer chewing chewy chief chili chill chimp chip chirpy chive choice choking chomp chooser choosy chop chosen chowder chrome chubby chuck chug chummy chump chunk churn chute cider cinch cinema circle circus citable citadel citizen citric citrus city civic civil clad claim clammy clamor clamp clang clapped clapper clarify clarity clash clasp class clatter clause claw clay clean clear cleat cleaver cleft clench clerk clever clicker client climate cling clinic clip clique cloak clobber clock clone cloning closure clothes cloud clover clubbed clump clumsy clunky clutch clutter coach coastal coaster coat cobalt cobbler cobweb cocoa coconut coerce coexist coffee coil coke cola cold collage collar collide collie colony colt coma come comfort comfy comic coming comma commend comment commode common commute company compare compel compile comply compost comrade concave conceal concept concert conch concise concur condone conduit cone confess confirm conform conical conjure consent console consult contact contend contest context contort contour control convene convent cope copied copier copilot coping copious copper copy coral cork corncob cornea corned corner corny coroner corral correct corrode corsage corset cortex cosmic cosmos cost cottage cotton couch cough could country county courier cover coveted coyness cozily cozy cradle crafter crafty cramp crane cranial cranium crank crate crave craving crayon crazed crazily crazy creamed creamer crease create credit creed creme creole crepe crept crested crevice crewman crib cricket cried crier crimp crimson cringe crinkle crinkly crisped crisply crispy critter croak crock crook croon crop cross crouch crouton crowbar crowd crown crucial crudely cruelly cruelty crumb crummy crumpet crunchy crushed crusher crust crux crying cryptic crystal cube cubical cubicle cuddle cuddly culprit culture cupcake cupid cupped cupping curable curator curdle cure curfew curing curled curler curling curly curry curse cursive cursor curtain curtly curtsy curve curvy cushy cusp cussed custard custody customs cycle cyclic cycling cyclist cymbal dagger daily dainty dairy daisy dance dancing dander dandy danger dangle dares darkish darling darn dart dash data dating dawdler dawn daybed daycare daylong dayroom daytime dazzler deacon dealer dealing dealt dean debate debit debrief debtor debug debunk decade decaf decal decay deceit decency decent decibel decimal deck decline decode decoy decree deduce deduct deed deem deepen deeply deface defame default defeat defense defiant defile define deflate defog defraud defrost deftly defuse defy degree deity delay delete delouse delta deluge deluxe demise demote denial denim denote dense density dental dentist denture deny depict deplete deploy deport depose depress deprive depth deputy derail derby derived deserve desktop despair despise despite destiny detail detest detract deuce devalue deviant deviate device devious devotee diagram dial diaper diary dice dicing dictate dill dilute dime dimly dimmed dimmer dimness dimple diner dingbat dinghy dingo dingy dining dinner diocese dioxide diploma dipped dipper dipping disarm disband discard discern discuss disdain dish disjoin disk dislike dismay dismiss disobey disown display dispose dispute disrupt distant distill distort ditch ditto ditzy divided diving dizzy doable docile dock dodge dodgy doily doing dole dollar dollop dolly dolphin domain donated donator donor donut doodle doorman doormat doorway doozy dork dorsal dosage dose dotted douche dove down dowry doze drab drained drainer drank drapery drastic draw dreaded dreamt dreamy dreary drench dress drew dribble dried drier drift driller drippy driven driver driving drizzle drizzly drone drool droop dropbox droplet dropout dropper drove drown drudge drum dubbed duchess ducking ducky duct dude duffel dugout duke duller duly dumping dupe duplex durable durably duress during dusk dust dutiful duty duvet dwarf dweeb dwelled dweller dwindle dynamic dynasty each eagle earache eardrum earflap earful earlobe early earmark earmuff earring earshot earthen earthly earthy earwig easeful easel easiest easily easing easter eatable eaten eatery eating eats ebay ebony ebook ecard echo eclair eclipse ecology economy edge edging edgy edition editor effects effort egging eggnog egotism either eject elastic elated elbow elderly eldest elevate eleven elite elitism elixir ellipse elope elude elusive elves email embargo embark embassy ember emblaze emblem embody emboss emcee emerald emit emote emotion empathy emperor empower emptier empty enable enamel enclose encode encore encrust encrypt ended ending endless endnote endorse energy engaged engine engorge engross engulf enhance enjoyer enrage enrich enroll enslave ensnare ensure entail entire entitle entity entomb entrap entree entrust entwine envious envoy envy enzyme epic episode equal equate equator equinox equity erased eraser erasure errand errant erratic error erupt eskimo esquire essay essence estate etching eternal ethanol ether ethics evacuee evade evasion evasive even evict evident evil evoke evolve exact exalted example excess exclaim exclude excuse exert exes exhale exhaust exhume exile exit exodus expand expanse expel expend expert expire explain explode exploit explore expose express extent extinct extras extrude fable fabric faceted facial facing faction factoid factor factual faculty fade fading failing falcon fall false falsify fame family famine fanatic fancied fancy fanfare fang fanning fantasy fascism faster fasting faucet favored feast federal fedora feeble feed feel feisty feline femur fence fencing fender ferment ferret ferris ferry fervor fester festive fetal fetch fever fiber fiction fiddle fidgety fifteen fifth fifty figment figure filing filled filler filling film filter filth finale finally finance finch finer finicky finite finless finlike five flaccid flagman flail flakily flaky flame flanked flap flaring flashy flask flatbed flatly flatten flattop fled fleshed fleshy flick flier flight flinch fling flint flip flirt float flock flop floral florist floss flyable flyaway flyer flying flyover foam foil folic folk follow fondly fondue font food fool footage footer footing footman footpad footsie fossil foster founder foyer fragile frail frame framing frantic frayed fraying frays freebee freebie freedom freeing freely freeway freight french frenzy fresh fretful fretted friday fridge fried friend frill fringe frisbee frisk fritter frolic from front frosted frosty froth frown frozen fruit frying gaffe gaining gains gala gallery galley gallon gallows galore game gaming gamma gander gangly gangway garage garbage garden gargle garland garlic garment garnet garnish garter gating gauging gauze gave gawk gazing gear gecko geek geiger gender generic genre gentile gently gents geology gerbil gestate gesture getaway getting getup giant giblet giddily giddy gift giggle giggly gigolo gilled gills gimmick girdle given giver giving gizmo gizzard glacial glacier glade gladly glamour glance glare glaring glass glazing gleeful glider gliding glimmer glimpse glisten glitch glitter glitzy gloater gloomy glorify glory gloss glove glowing glucose glue gluten glutton gnarly gnat goal goes goggles going golf goliath gonad gondola gone gong good gooey goofy google goon gopher gore gorged gory gosling gossip gothic gotten gout gown grab graded grader grading grafted grain grandly grandma grandpa granite granny granola grant grape graph grapple grasp grass gratify grating gravel graves gravity gravy gray grazing greedy green greeter grew grid grief grill grimace grime grimy grinch grip gristle grit groggy groin groom groove groovy grope ground grouped grout grove grower growing growl grub grudge gruffly grumble grumbly grunge grunt guide guiding guise gulf gully gulp gumball gumdrop gumming gummy gurgle guru gush gusto gusty gutless guts gutter guzzler habitat hacked hacker hacking hacksaw haggler haiku half halogen halt halved halves hamlet hammock hamper hamster handbag handed handful handgun handled handler handoff handsaw handset hangout hangup hankie hanky happier happily happy harbor hardhat hardly hardy harmful harmony harness harpist harsh harvest hash hassle haste hastily hasty hatbox hatchet hate hatless hatred haunt haven hazard hazily hazing hazy headed header heading headset headway heap heat heave heavily heaving hedge hedging hefty helium helmet helper helpful helping hemlock hence henna herald herbal herbs hermit heroics heroism herring herself hertz hexagon hubcap huddle huff hula hulk hull human humble humbly humid humming hummus humped humvee hunger hungry hunk hunter hunting hurdle hurled hurler hurling hurray hurried hurry hurt husband hush husked hybrid hydrant hyphen iciness icing icky icon ideally idiocy idiom idly igloo ignore iguana image imaging imitate immerse impale impart impeach impish implant implode imply impose impound imprint improve impulse impure iodine iodize ipad iphone ipod irate iron islamic isotope issue issuing italics item itunes ivory jackal jacket jackpot jailer janitor january jargon jarring jasmine jaunt java jawed jawless jawline jaws jaybird jazz jeep jellied jelly jersey jester jiffy jigsaw jimmy jingle jinx jitters jittery jockey jogger jogging john joining jolly jolt jovial joyous joyride judge judo juggle jugular juice juicy jujitsu jukebox july jumble jumbo jump june junior juniper junkie junkman jurist juror jury justice justify justly kabob karaoke karate karma kebab keenly keep kelp kennel kept kettle kick kiln kilt kimono kindle kindly kindred kinetic kinfolk king kinship kinsman kisser kissing kitchen kite kitten kitty kiwi kleenex knee knelt knoll koala kooky kosher krypton kudos kung labored laborer ladder ladies ladle ladybug lagged lagging lagoon lair lake lance landed landing lanky lantern lapdog lapel lapped lapping laptop lard large lark lash lasso last latch late lather latrine latter launch launder laundry laurel lavish lazily lazy left legacy legal legend legged legible legibly lego legroom legume legwork lemon lend length lens lent leotard lesser letdown letter lettuce level levers liable liberty library licking life lifter lifting liftoff likely liking lilac lilly lily limb limeade limes limit limping line lingo lining linked linseed lint lion liquefy liqueur liquid lisp list litmus litter little livable lived lively liver lividly living lizard lucid luckily lugged lullaby lumber lumping lumpish lunacy lunar lung lurch lure lurk lushly luster lustily lusty luxury lying lyrics macaw mace machine magenta maggot magical magma magnify maimed majesty maker making malt mama mammal mammary manager manatee mandate manger mangle mango mangy manhole manhood manhunt manila mankind manlike manly manmade manned mannish manor mantis mantra manual many marbled marbles march mardi margin marina marine marital marlin maroon married marrow marry marshy marxism mascot mashed mashing masses massive mastiff matador matcher math mating matrix matron matted matter mauve maximum maybe mayday moaner moaning mobile mobster mocha mocker mockup modify modular module moisten molar mold mollusk monday mongrel monitor monsoon monthly moocher moody mooing mooned moonlit morale morally morse mortify mosaic mossy most motion motive motor motto mounted mourner mouse mousy mouth movable move movie moving mower mowing much muck mulch mule mulled mullets mumble mumbo mummify mummy mumps mundane muppet mural murky museum mushily mushy music musket musky mustang mustard muster musty mutable mutate mute mutiny mutt mutual muzzle myself myspace mystify myth nacho nail name naming nanny nape napkin napped napping nappy narrow nastily native natural nature navy nearby nearest nearly neatly nebula nectar negate nemeses nemesis neon nephew nerd nervous nervy nest neuron neuter neutron never next nibble niece nifty nimble nimbly ninja ninth nuclear nuclei nucleus nugget nullify number numbing numbly numeral numeric nursery nursing nurture nutcase nutlike nutmeg nutty nuzzle nylon oasis object obliged oblong oboe obscure obtain obtuse obvious occupy ocean ocelot octagon octane october octopus ogle oink okay olive omega omen ominous omit onboard ongoing onion online only onset onshore onstage onto onward onyx oops ooze oozy opacity opal open operate opium opossum oppose osmosis other otter ouch ought ounce outage outback outbid outcast outcome outer outfit outgrow outing outlast outlet outline outlook outmost outpost outpour output outrage outrank outsell outward outwit oval ovary oven overact overall overbid overdue overfed overlap overlay overpay overrun overtly overuse oxford oxidant oxidize oxygen oyster ozone paced pacific pacify padded padding paddle padlock pagan pager paging pajamas palace palm paltry pampers panama pancake panda pang panic panning panther pantry pants papaya paper paprika papyrus parade paradox parcel parched pardon parish parka parking parkway parlor parole parrot parsley parsnip partake parted parting partly partner party passage passing passion passive pasta pasted pastel pastime pastor pasture pasty patchy path patient patio patriot patrol pauper paver paving pawing payable payback payday payee payer paying payment payroll pebble pebbly pecan pectin pelican pellet pelt pelvis penalty pencil pendant pending pennant penny penpal pension percent perch perfume perish perjury perky perm pesky peso pester petal petite petri petted petty petunia phantom phobia phoenix phoney phonics phony photo phrase placard placate plank planner plant plasma plaster plastic plated plating platter player playful playing playoff playpen playset plaza pleat pledge plenty pliable plod plop plot plow ploy pluck plug plunder plural plus plywood poach poem poet pogo pointed pointer pointy poise poison poker poking polar police policy polio polish polka polo polygon polymer poncho pond pony popcorn pope poplar popper poppy popular pork porous portal portion portly poser posh posing possum postage postal postbox posted poster posting posture postwar pouch pounce pound pouring pout powdery power powwow prance pranker prayer praying preachy precise precook precut predict preface prefix pregame prelaw prelude premium prepaid prepay preplan preppy preset preshow presoak press presume preteen pretext pretty pretzel prevail prevent preview prewar pried primal primary primate primer primp print prior prism prison prissy privacy private prize probe probing problem process prodigy produce product profane profile progeny program prone prong pronto proofs propose props prorate proton proud proved proven proving provoke prowess prowler proxy prozac prude prune pruning psychic public pucker pueblo pull pulp pulsate pulse puma pumice pummel punch pungent punk pupil puppet puppy purely purge purging purify purist puritan purity purple purr purse pursuit pusher pushing pushpin pushup pushy putdown putt puzzle pyramid python quack quail quake quaking qualify quality qualm quantum quarrel quarry quartet quench query quicken quickly quiet quill quilt quintet quirk quit quiver quote rabid race racing racism rack racoon radar radial radio radish raffle raft rage ragged raging ragweed raider railcar railing railway raisin rake raking rally ramble ramp ramrod ranch random ranged ranger ranging ranked ranking ransack ranting rants rare rarity rascal rash rasping ravage raven ravine raving ravioli reach reactor ream reapply reason reawake rebate rebel rebirth reboot reborn rebound rebuff rebuild rebuilt recall recant recast recede recent recess recital recite reclaim recluse recoil recolor recopy record recount recoup rectal rectify reenact reenter reentry referee refill refined reflex reflux refocus refold refract refrain refresh refried refund refusal refuse refute regain regalia regally reggae regime region regress regroup regular rehab reheat rehire reissue rejoice rejoin relapse related relax relay relearn release reliant relic relieve relight relish relive reload relock rely remake remark remarry rematch remedy remix remnant remold remorse remote removal removed remover rename renewal renewed rental rented renter reoccur reopen reorder repaint repair repave repeal repent replace replay replica reply repose repost reprint reprise reps reptile request require reroute rerun resale rescuer reseal resend resent reset reshape reshoot residue resize resort respect result resume retail retake rethink retinal retired retiree retold retool retouch retrace retract retrain retread retreat retrial retry return retying retype reunion reunite reuse reveal reveler revenge revenue reverb revered reverse revert revise revisit revival reviver revoke revolt reward rewash rewind rewire reword rework rewrap rewrite rhyme ribbon ribcage rice riches richly rickety ricotta ridden ride riding rifling rift rigging rigid rigor rimless rimmed rind rink rinse rinsing riot ripcord ripping ripple riptide rise rising risk risotto ritalin ritzy rival riveter roamer roaming roast robbing robe robin robust rocker rocket rocking rocky rogue roman romp rope roping roster rosy rotten rotting rotunda roundup routine routing rover roving royal rubbed rubber rubbing rubble rubdown ruby ruckus rudder ruined rule rumble rummage rumor rundown runner running runny runt runway rupture rural ruse rush rust sabbath sacred sadden saddled sadly sadness safari safely saffron saga sage sagging saggy said saint sake salad salami salary saline salon saloon salsa salt salute salvage same sample sandal sandbag sandbar sandbox sanded sanding sandlot sandpit sandy sank santa sapling sappy sarcasm sardine sash sassy satchel satin satisfy saucy sauna savage savanna saved savings savior savor scabbed scabby scalded scale scaling scallop scam scandal scanner scant scarce scared scarf scarily scary scenic scheme scholar science scion scoff scone scoop scooter scope scorch scored scorer scoring scorn scotch scoured scouts scrap scratch scrawny screen scribe script scroll scrooge scruffy scrunch scuba scuff scurvy scuttle second secrecy secret sector secular sedan sedate seduce segment seismic seizing seldom self seltzer seminar senate senator send senior sepia septic septum sequel series sermon serpent serve service serving sesame setback setting settle setup seventh seventy shabby shack shaded shadily shading shadow shady shaft shakily shaking shaky shale shallot shallow shame shampoo shank shanty shape shaping share sharper sharpie sharply shawl sheath shed sheep sheet shelf shell shelter shelve sherry shield shifter shifty shimmer shimmy shindig shine shingle shining shiny ship shirt shock shone shopper shore shorten shorter shortly shorts shorty shout shove showbiz shower showing showman shown showoff showy shrank shriek shrill shrimp shrine shrink shrivel shrubs shrug shrunk shudder shuffle shun shush shut siamese sibling siding sierra siesta sift sighing silent silica silicon silk silly silo silt silver simile simple simply sincere singer singing single sinless sinner sinuous siren sister sitcom sitter sitting sixfold sixteen sixth sixties sizable sizably size sizing sizzle skater skating skeptic sketch skewed skewer skid skied skier skies skiing skilled skillet skimmed skimmer skinny skipper skirt skittle skyline skype skyward slab slacked slacker slacks slain slam slander slang slashed slate slather slaw sled sleek sleep sleet sleeve slept sliced slicer slicing slick slider sliding slimy slinky slip slit sliver slogan sloped sloping sloppy slot slouchy sludge slug slum slurp slush small smartly smasher smashup smell smile smirk smite smith smitten smock smog smoked smoking smoky smolder smooth smother smudge smudgy smugly snack snagged snaking snap snare snarl snazzy sneak sneer sneeze snide sniff snippet snitch snooper snooze snore snoring snorkel snort snout snowcap snowman snowy snub snuff snuggle snugly speak species specked specks speech speed speller spender spent spew sphere sphinx spider spied spiffy spill spilt spinach spinal spindle spinner spinout spiny spiral spirits splashy spleen splice splurge spoiled spoiler spoils spoken sponge spongy sponsor spoof spooky spool spoon spore sports sporty spotted spotter spotty spousal spouse spout sprain sprang sprawl spray spree sprig spring sprint sprite sprout spruce sprung spry spud spur sputter squad squall squash squeak squeeze squid squint squire squirt squishy stable stack stadium staff stage staging stained stamina stammer stamp stand stank staple starch stardom staring stark starlet starlit starry starter startle startup starved stash state static statue stature status statute staunch stays steam steed steep stellar stem stench stencil step stereo sterile sternum stew stick stiffen stiffly stifle stilt stimuli stinger stingy stinky stipend stir stitch stock stoic stoke stole stomp stoning stony stood stooge stool stoop stopped stopper storage storm stout stove stowing stratus straw stray streak stream street strep stress stretch strewn strict stride strife strike strive strobe strode struck strudel strum strung strut stubbed stubble stubbly stucco stuck student studied studio study stuffed stuffy stumble stump stung stunned stunner stunt stupor sturdy styling stylist stylus suave subdued subject sublet sublime subpar subplot subside subsidy subsoil subtext subtly subtype suburb subway subzero such suction sudden sudoku suds suffice suffix sugar suggest suing suitor sulfate sulfide sulfite sulfur sulk sullen sultry supper supply support supreme surely surface surfer surgery surging surname surpass surplus surreal survey survive sushi suspect suspend swab swagger swan swarm sway swear sweat sweep swell swept swerve swifter swiftly swimmer swinger swipe swirl switch swivel swizzle swooned swoop swoosh swore sworn swung symptom synapse synergy syrup system tabasco tabby tables tablet tabloid tacking tackle tacky taco tactful tactics tactile tadpole tainted take taking talcum tall talon tamale tamer tamper tank tanned tannery tanning tantrum tapered tapioca tapping taps target tarmac tarnish tarot tartar tartly task tassel taste tasting tasty tattle tattoo taunt tavern thank that thaw theater thee theft theme thermal thermos these thesis thicken thicket thigh thimble thing think thinly thinner thirsty thirty thong thorn those thrash thread thrift thrill thrive throat throng thrower thud thumb thus thyself tiara tibia tidal tidbit tidings tidy tiger tighten tightly tigress tile tiling till tilt timid timing timothy tinfoil tingle tingly tinker tinsel tint tinwork tiny tipoff tipped tipper tipping tiptop tiring tissue trace tracing track tractor trade trading traffic tragedy train traitor trance trapeze trapped trapper traps trash travel tray treason treat treble tree trekker tremble tremor trench trend triage trial tribune tribute triceps trickle tricky trident tried trifle trilogy trimmer trinity trio tripod triumph trivial trodden trophy tropics trouble trough trout trowel truce truck truffle trump trunks trustee truth tubby tubular tucking tuesday tuition tulip tumble tummy turban turbine turf turkey turmoil turret turtle tusk tutor tutu tweak tweed tweet twelve twenty twerp twice twiddle twig twine twins twirl twisted twister twisty twitch twitter tycoon tying tyke udder ultra umpire unable unaired unawake unaware unbaked unbend unbent unblock unboxed uncanny unchain uncheck uncivil unclad unclasp uncle unclip uncloak unclog uncork uncouth uncover uncross uncrown uncured uncut undated undead undergo undoing undone undress undying unearth unease uneasy uneaten unequal uneven unfair unfazed unfiled unfixed unfold unglue ungodly unhappy unheard unhinge unholy unhook unicorn unified unifier unify union unison unit unkempt unkind unknown unlaced unlatch unleash unless unlined unlit unloved unlucky unmade unmixed unmoral unmoved unnamed unnerve unpack unpaid unpaved unplug unquote unrated unread unreal unrest unripe unrobed unroll unruly unsafe unsaid unsaved unscrew unseen unsent unsnap unsold unstuck unsure unsworn untaken untamed untaxed untidy untie until untimed untold untried untrue untruth untwist untying unused unusual unvocal unwary unweave unwed unwell unwind unwired unworn unwound unwoven unzip upbeat upchuck update upfront upgrade upheld uphill uphold upload upon upper upright upriver uproar uproot upscale upside upstage upstart upstate upswing uptake uptight uptown upward upwind uranium urban urchin urgency urgent urging urology usable usage useable used user usher usual utensil utility utilize utmost utopia utter vacancy vacant vacate vaguely valiant valid valium valley value vanilla vanish vanity vantage varied variety various varmint varnish varsity varying vastly veal vegan veggie velcro velvet vending vendor venture venue venus verbose verdict verify verse version versus vertigo very vessel vest veteran veto viable vibes vice victory video viewer viewing village villain vintage violate violet violin viper viral virtual virus visa viscous visible visibly vision visitor visor vista vitally vividly vixen vocally voice voicing void volley voltage volumes voter voting voucher vowed vowel voyage wafer waffle waged wager wages waggle wagon wake waking walk walmart walnut walrus waltz wand wannabe wanted wanting wasabi washday washed washer washing washout washtub wasp wasting watch water waving wavy whacky wham wharf wheat whiff whinny whiny whoever whole whoopee whoops wick widely widen widget widow width wielder wife wifi wildcat wilder wildly willed willing willow wilt wimp wince wincing wind wing winking winner winter wipe wired wiring wiry wisdom wise wish wispy wistful wizard wobble wobbly wolf womanly womb woof wooing wool woozy word work worried worrier worry worst wound woven wrangle wrath wreath wrecker wrench wriggle wriggly wrinkle wrinkly wrist writing written wronged wrongly wrought xbox xerox yahoo yanking yapping yard yarn yeah yearly yeast yelling yelp yiddish yield yippee yodel yoga yogurt yonder yoyo yummy zealous zebra zero zesty zipfile zipping zippy zips zodiac zombie zone zoning zoology zoom".split(" ");
+    const G = { mode: "phrase", words: 4, caps: true, num: true, len: 20, sym: true, value: "", bits: 0 };
+    function rnd(n) { const lim = Math.floor(0x100000000 / n) * n, a = new Uint32Array(1); let x; do { crypto.getRandomValues(a); x = a[0]; } while (x >= lim); return x % n; }
+    function generate() {
+      if (G.mode === "phrase") {
+        const w = Array.from({ length: G.words }, () => WORDLIST[rnd(WORDLIST.length)]).map(x => G.caps ? x[0].toUpperCase() + x.slice(1) : x);
+        if (G.num) { const i = rnd(w.length); w[i] += String(10 + rnd(90)); }
+        G.value = w.join("-"); G.bits = G.words * Math.log2(WORDLIST.length) + (G.num ? Math.log2(90 * G.words) : 0);
+      } else {
+        const sets = ["abcdefghijkmnopqrstuvwxyz", "ABCDEFGHJKLMNPQRSTUVWXYZ", "23456789"].concat(G.sym ? ["!@#$%&*?-_=+"] : []), all = sets.join("");
+        let c; do { c = Array.from({ length: G.len }, () => all[rnd(all.length)]); } while (!sets.every(s => c.some(ch => s.includes(ch))));
+        G.value = c.join(""); G.bits = G.len * Math.log2(all.length);
+      }
+    }
+    function genPanel() {
+      if (!G.value) generate();
+      const p = panel("Need a new one?", "Made on your device with secure randomness. Nothing is sent or saved.");
+      const box = el("div", "gen"); p.append(box);
+      const build = () => {
+        box.replaceChildren();
+        const modes = el("div", "seg");
+        [["phrase", "Passphrase"], ["random", "Random characters"]].forEach(([m, label]) => { const b = el("button", "chipbtn", label); b.type = "button"; b.setAttribute("aria-pressed", String(G.mode === m)); b.addEventListener("click", () => { G.mode = m; generate(); build(); }); modes.append(b); });
+        const outEl = el("div", "genout", G.value);
+        const info = el("p", "hint"); info.style.margin = "0";
+        info.textContent = `About ${Math.round(G.bits)} bits of randomness. Would take ${duration(Math.pow(2, G.bits) / 2 / 1e10).toLowerCase()} to crack offline.`;
+        const ctl = el("div", "genrow");
+        const range = el("input"); range.type = "range"; range.id = "gen-size";
+        if (G.mode === "phrase") { range.min = 3; range.max = 8; range.value = G.words; } else { range.min = 12; range.max = 40; range.value = G.len; }
+        const val = el("span", "val", G.mode === "phrase" ? `${G.words} words` : `${G.len} chars`);
+        range.setAttribute("aria-label", G.mode === "phrase" ? "Number of words" : "Number of characters");
+        range.addEventListener("input", () => { if (G.mode === "phrase") G.words = +range.value; else G.len = +range.value; generate(); build(); const r2 = document.getElementById("gen-size"); if (r2) r2.focus(); });
+        ctl.append(range, val);
+        const toggle = (id, label, key) => { const l = el("label", "tg"); const i = el("input"); i.type = "checkbox"; i.id = id; i.checked = G[key]; i.addEventListener("change", () => { G[key] = i.checked; generate(); build(); }); l.append(i, document.createTextNode(label)); return l; };
+        const opts = el("div", "genrow");
+        if (G.mode === "phrase") opts.append(toggle("gen-caps", "Capitals", "caps"), toggle("gen-num", "Add a number", "num"));
+        else opts.append(toggle("gen-sym", "Symbols", "sym"));
+        const btns = el("div", "genrow");
+        const again = el("button", "btnp", "New one"); again.type = "button"; again.addEventListener("click", () => { generate(); build(); });
+        const test = el("button", "copybtn", "Test this one"); test.type = "button";
+        test.addEventListener("click", () => { if (!pwInput) return; pwInput.value = G.value; window.scrollTo({ top: 0, behavior: "smooth" }); if (pwForm.requestSubmit) pwForm.requestSubmit(); else pwForm.dispatchEvent(new Event("submit", { cancelable: true })); });
+        btns.append(again, copyButton(() => G.value), test);
+        box.append(modes, outEl, info, ctl, opts, btns);
+      };
+      build();
+      return p;
+    }
 
     function analyse(pw) {
       const lower = pw.toLowerCase(), traits = [];
@@ -829,6 +1063,7 @@ footer a { color: inherit; }
         .forEach(([b, c, s]) => { const d = el("div"); d.append(el("b", null, b), el("code", null, c), el("span", null, s)); flow.append(d); });
       p2.append(flow);
       g2.append(p1, p2); out.append(g2);
+      out.append(genPanel());
       out.append(stepsPanel("Better passwords", "What we recommend to every client.", [
         ["Use passphrases", "three or four random words, like river-candle-orbit-plum, are long and memorable."],
         ["Never reuse", "one breached site shouldn't unlock your email, bank or Microsoft 365."],
@@ -840,7 +1075,8 @@ footer a { color: inherit; }
     let busy = false;
     function mount() {
       const f = searchForm({ id: "pw-input", label: "Password", type: "password", placeholder: "Type a password to test", button: "Check password", reveal: true, autocomplete: "new-password" });
-      dial = buildHero({ eyebrow: "Password check", title: 'Is your password <span class="hl">already out there</span>?', lede: "Rates how quickly a password could be cracked and checks it against more than a billion passwords exposed in breaches, without the password ever leaving your device.", form: f.form,
+      pwInput = f.input; pwForm = f.form;
+      dial = buildHero({ eyebrow: "Password check", title: 'Is your password <span class="hl">already out there</span>?', lede: "Rates how quickly a password could be cracked and checks it against more than a billion passwords exposed in breaches, without the password ever leaving your device. Need a new one? There's a generator below the results.", form: f.form,
         fine: [document.createTextNode("Uses Have I Been Pwned's "), extA("Pwned Passwords", "https://haveibeenpwned.com/Passwords"), document.createTextNode(" service with k-anonymity. We never see or store what you type. "), exLink("See an example result", () => showSample())] });
       let t;
       f.input.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { if (f.input.value) render(analyse(f.input.value), null, false); }, 180); });
@@ -924,17 +1160,24 @@ footer a { color: inherit; }
       out.append(cta("Steer IT can harden your website's configuration and keep its software, plugins and certificates up to date."));
     }
     let busy = false;
+    // Returns { data } on success, { nx: true } if the host doesn't exist, or { offline: true }
+    async function fetchData(host) {
+      const [obs, a, aaaa, caaApex] = await Promise.all([
+        fetch(OBS + encodeURIComponent(host), { method: "POST" }).then(r => r.ok ? r.json() : null).then(j => j && !j.error && j.grade ? j : null).catch(() => null),
+        dns(host, "A").catch(() => null), dns(host, "AAAA").catch(() => null), dns(host.split(".").slice(-3).join(".").replace(/^www\./, ""), "CAA").catch(() => null)
+      ]);
+      if (!a && !aaaa && !obs) return { offline: true };
+      if (a && a.Status === 3) return { nx: true };
+      return { data: { obs, a: answers(a, "A"), aaaa: answers(aaaa, "AAAA").length > 0, caa: answers(caaApex, "CAA"), ad: !!(a && a.AD) } };
+    }
     async function run(host, btn) {
       if (busy) return; busy = true; btn.disabled = true;
       loading("Scanning " + host + ". This can take up to 30 seconds…"); dial.set({ scanning: true });
       try {
-        const [obs, a, aaaa, caaApex] = await Promise.all([
-          fetch(OBS + encodeURIComponent(host), { method: "POST" }).then(r => r.ok ? r.json() : null).then(j => j && !j.error && j.grade ? j : null).catch(() => null),
-          dns(host, "A").catch(() => null), dns(host, "AAAA").catch(() => null), dns(host.split(".").slice(-3).join(".").replace(/^www\./, ""), "CAA").catch(() => null)
-        ]);
-        if (!a && !aaaa && !obs) { dial.set(); return errorBox("Couldn't scan that site", NET_ERR); }
-        if (a && a.Status === 3) { dial.set(); return errorBox("That site doesn't exist", `No DNS records were found for ${host}. Check the spelling.`); }
-        render(host, { obs, a: answers(a, "A"), aaaa: answers(aaaa, "AAAA").length > 0, caa: answers(caaApex, "CAA"), ad: !!(a && a.AD) }, false);
+        const r = await fetchData(host);
+        if (r.offline) { dial.set(); return errorBox("Couldn't scan that site", NET_ERR); }
+        if (r.nx) { dial.set(); return errorBox("That site doesn't exist", `No DNS records were found for ${host}. Check the spelling.`); }
+        render(host, r.data, false);
       } finally { busy = false; btn.disabled = false; }
     }
     const SAMPLE = { host: "northbay-accounts.co.uk", data: { obs: { grade: "C", score: 50, tests_passed: 6, tests_failed: 4, tests_quantity: 10, status_code: 200 }, a: ["185.199.110.153"], aaaa: false, caa: [], ad: false } };
@@ -947,8 +1190,9 @@ footer a { color: inherit; }
         f.input.value = h; run(h, f.button); });
       render(SAMPLE.host, SAMPLE.data, true);
       foot.replaceChildren(el("div", null, "Security headers graded by Mozilla's HTTP Observatory (a site can be rescanned once a minute). DNS via Google Public DNS. These are passive checks and don't replace a penetration test."));
+      const pre = takePrefill("website"); if (pre) { f.input.value = pre; run(pre, f.button); }
     }
-    return { mount };
+    return { mount, fetchData, SAMPLE };
   })();
 
   // ================= Tool: Speed test =================
@@ -1081,6 +1325,27 @@ footer a { color: inherit; }
 
     function bloatGrade(extra) { return extra == null ? ["—", ""] : extra < 5 ? ["A+", "var(--good)"] : extra < 30 ? ["A", "var(--good)"] : extra < 60 ? ["B", "var(--good)"] : extra < 200 ? ["C", "var(--warn)"] : extra < 400 ? ["D", "var(--bad)"] : ["F", "var(--bad)"]; }
 
+    let conn = null, connEl = null;
+    const EXAMPLE_CONN = { ipv4: "203.0.113.24", ipv6: "2001:db8:4c2::1a", isp: "Example ISP", city: "Cardiff", country: "GB" };
+    async function fetchConn() {
+      const j = (u) => fetch(u, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null);
+      const [v4, any, meta] = await Promise.all([j("https://api.ipify.org?format=json"), j("https://api64.ipify.org?format=json"), j(BASE + "/meta")]);
+      if (!v4 && !any && !meta) return null;
+      const ips = [v4 && v4.ip, any && any.ip, meta && meta.clientIp].filter(Boolean).map(String);
+      return { ipv4: ips.find(x => !x.includes(":")) || null, ipv6: ips.find(x => x.includes(":")) || null, isp: meta && meta.asOrganization || null, city: meta && meta.city || null, country: meta && meta.country || null };
+    }
+    function connPanel(c, isExample) {
+      const p = panel("Your connection", isExample ? "Example values. Your own details show here when the app is online." : "How other websites see this device's internet connection.");
+      const dl = el("dl", "kv");
+      const row = (k, v, copy) => { dl.append(el("dt", null, k)); const d = el("dd"); d.append(el("code", null, v)); if (copy) { d.append(document.createTextNode(" ")); d.append(copyButton(v)); } dl.append(d); };
+      row("Public IPv4", c.ipv4 || "Not found", !!c.ipv4 && !isExample);
+      dl.append(el("dt", null, "IPv6")); const d6 = el("dd"); d6.append(el("span", "pill " + (c.ipv6 ? "good" : ""), c.ipv6 ? "Working" : "Not available")); if (c.ipv6) { d6.append(document.createTextNode(" ")); d6.append(el("code", null, c.ipv6)); } dl.append(d6);
+      dl.append(el("dt", null, "Internet provider")); dl.append(el("dd", null, c.isp || "Unknown"));
+      dl.append(el("dt", null, "Approximate location")); dl.append(el("dd", null, [c.city, c.country].filter(Boolean).join(", ") || "Unknown"));
+      p.append(dl);
+      if (!c.ipv6) p.append(el("p", "note", "Many UK broadband and mobile connections still don't offer IPv6. It isn't a problem today, but newer services increasingly expect it."));
+      return p;
+    }
     function render(r, isExample) {
       out.replaceChildren();
       const extra = r.loadedLatency != null ? Math.max(0, r.loadedLatency - r.latency) : null;
@@ -1096,6 +1361,7 @@ footer a { color: inherit; }
       const gauges = el("div", "speedgauges");
       gauges.append(speedGauge(r.down, "Download", "var(--steer-cyan)"), speedGauge(r.up, "Upload", "var(--steer-blue)"));
       out.append(gauges);
+      connEl = connPanel(conn || EXAMPLE_CONN, !conn); out.append(connEl);
       out.append(figures([[Math.round(r.latency) + " ms", "latency (ping) when idle", r.latency < 40 ? "var(--good)" : r.latency < 100 ? "var(--warn)" : "var(--bad)"], [r.jitter.toFixed(1) + " ms", "jitter", r.jitter < 15 ? "var(--good)" : r.jitter < 30 ? "var(--warn)" : "var(--bad)"], [bg, extra != null ? `responsiveness under load (+${Math.round(extra)} ms)` : "responsiveness under load", bgc], [String(people), "people on HD video calls at once, roughly", people >= 5 ? "var(--good)" : people >= 2 ? "var(--warn)" : "var(--bad)"]]));
 
       const g2 = el("div", "grid2");
@@ -1154,9 +1420,10 @@ footer a { color: inherit; }
     function mount() {
       const row = el("div", "start-row");
       const btn = el("button", "primary", "Start speed test"); btn.type = "button";
+      fetchConn().then(c => { if (!c) return; conn = c; if (connEl && connEl.isConnected) { const n = connPanel(c, false); connEl.replaceWith(n); connEl = n; } });
       const ph = el("span", "phase", "Takes about 25 seconds.");
       row.append(btn, ph);
-      dial = buildHero({ eyebrow: "Speed test", title: 'How fast is <span class="hl">your internet</span>, really?', lede: "Measures download and upload speed, ping, jitter and how responsive the line stays when it's busy, then tells you what that means for calls, backups and the rest of the office.", form: row,
+      dial = buildHero({ eyebrow: "Speed test", title: 'How fast is <span class="hl">your internet</span>, really?', lede: "Measures download and upload speed, ping, jitter and how responsive the line stays when it's busy, then tells you what that means for calls, backups and the rest of the office. It also shows your public IP address and internet provider.", form: row,
         fine: [document.createTextNode("Tests against Cloudflare's global network. Pause other downloads for the most accurate result. "), exLink("See an example result", () => render(sample(), true))] });
       btn.addEventListener("click", () => run(btn, ph));
       render(sample(), true);
@@ -1386,9 +1653,971 @@ footer a { color: inherit; }
         f.input.value = h; run(h, f.button); });
       const s = sample(); render(s.domain, s, true);
       foot.replaceChildren(el("div", null, "DNS doesn't let the public list every record in a zone, so this checks each record type, about 60 common hostnames and public certificate logs (crt.sh). Records on unusual hostnames may not appear; your DNS host's control panel is the only complete list."));
+      const pre = takePrefill("dns"); if (pre) { f.input.value = pre; run(pre, f.button); }
+    }
+    // Who runs the DNS, email and website, from a handful of lookups
+    async function quickSummary(domain) {
+      const res = await Promise.all([dns(domain, "NS"), dns(domain, "MX"), dns(domain, "TXT"), dns(domain, "A"), dns("www." + domain, "CNAME"), dns("www." + domain, "A"), dns("_dmarc." + domain, "TXT")].map(p => p.catch(() => null)));
+      return summarise(domain, res.flatMap(r => parse(r, "apex")), res.some(r => r && r.AD));
+    }
+    function sampleSummary() { const s = sample(); return summarise(s.domain, s.records, s.ad); }
+    return { mount, quickSummary, sampleSummary };
+  })();
+
+  // ================= Tool: Domain and certificate expiry =================
+  const Expiry = (() => {
+    let dial;
+    const DAY = 86400000;
+    const daysUntil = (d) => d ? Math.floor((new Date(d) - Date.now()) / DAY) : null;
+    const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "Unknown";
+    async function fetchT(url, ms) {
+      const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), ms);
+      try { return await fetch(url, { signal: ctrl.signal }); } finally { clearTimeout(t); }
+    }
+    function vcardName(ent) {
+      try { const v = ent.vcardArray[1].find(x => x[0] === "fn"); if (v && v[3]) return String(v[3]); } catch {}
+      return ent.handle || null;
+    }
+    function findRole(ents, role) {
+      for (const e of ents || []) { if ((e.roles || []).includes(role)) return e; const n = findRole(e.entities, role); if (n) return n; }
+      return null;
+    }
+    function parseRdap(j) {
+      const ev = (name) => ((j.events || []).find(e => e.eventAction === name) || {}).eventDate || null;
+      const reg = findRole(j.entities, "registrar");
+      return {
+        expires: ev("expiration"), registered: ev("registration"), updated: ev("last changed") || ev("last update of RDAP database"),
+        registrar: reg ? vcardName(reg) : null, status: (j.status || []).map(String),
+        ns: (j.nameservers || []).map(n => String(n.ldhName || "").toLowerCase()).filter(Boolean),
+        dnssec: !!(j.secureDNS && j.secureDNS.delegationSigned)
+      };
+    }
+    async function rdap(domain) {
+      const urls = [`https://rdap.org/domain/${domain}`];
+      if (/\.uk$/.test(domain)) urls.unshift(`https://rdap.nominet.uk/uk/domain/${domain}`);
+      for (const u of urls) {
+        try { const r = await fetchT(u, 15000); if (r.status === 404) return { notFound: true }; if (r.ok) return parseRdap(await r.json()); } catch {}
+      }
+      return null;
+    }
+    async function cert(domain) {
+      try {
+        const r = await fetchT(`https://crt.sh/?q=${encodeURIComponent(domain)}&output=json&exclude=expired`, 20000);
+        if (!r.ok) return null;
+        const list = await r.json(), now = Date.now();
+        const wanted = new Set([domain, "www." + domain, "*." + domain]);
+        const valid = list.filter(c => String(c.name_value || "").split(/\n/).some(n => wanted.has(n.trim().toLowerCase())))
+          .map(c => ({ from: new Date(c.not_before + "Z"), to: new Date(c.not_after + "Z"), issuer: String(c.issuer_name || ""), names: String(c.name_value || "").split(/\n/).map(n => n.trim()).filter(Boolean) }))
+          .filter(c => c.from <= now && c.to > now)
+          .sort((a, b) => b.to - a.to);
+        if (!valid.length) return { none: true };
+        const c = valid[0];
+        const issuer = (c.issuer.match(/O=("?)([^,"]+)\1/) || [])[2] || (c.issuer.match(/CN=([^,]+)/) || [])[1] || "Unknown";
+        return { expires: c.to.toISOString(), issued: c.from.toISOString(), issuer, names: [...new Set(c.names)].slice(0, 8) };
+      } catch { return null; }
+    }
+    async function fetchData(domain) {
+      const [d, c] = await Promise.all([rdap(domain), cert(domain)]);
+      return { domain: d, cert: c };
+    }
+    // 0-100 score for the full report; null when nothing could be read
+    function score(data) {
+      const parts = [];
+      const dd = data.domain && !data.domain.notFound ? daysUntil(data.domain.expires) : null;
+      const cd = data.cert && !data.cert.none ? daysUntil(data.cert.expires) : null;
+      if (dd != null) parts.push(dd > 60 ? 100 : dd > 30 ? 60 : 15);
+      if (cd != null) parts.push(cd > 21 ? 100 : cd > 7 ? 60 : 10);
+      if (data.cert && data.cert.none) parts.push(20);
+      return parts.length ? Math.round(parts.reduce((a, b) => a + b, 0) / parts.length) : null;
+    }
+    function issues(data) {
+      const out = [], d = data.domain, c = data.cert;
+      const dd = d && !d.notFound ? daysUntil(d.expires) : null, cd = c && !c.none ? daysUntil(c.expires) : null;
+      if (dd != null && dd <= 60) out.push({ status: dd <= 30 ? "fail" : "warn", name: `Domain expires in ${dd} days`, what: "Renew it now and switch on auto-renew, or the website and email will stop working." });
+      if (cd != null && cd <= 21) out.push({ status: cd <= 7 ? "fail" : "warn", name: `Website certificate expires in ${cd} days`, what: "Visitors will see a security warning if it isn't renewed in time." });
+      if (c && c.none) out.push({ status: "fail", name: "No valid website certificate found", what: "The site may show a 'Not secure' warning." });
+      return out;
+    }
+    function ring(days, max, label, colour) {
+      const svg = sv("svg", { viewBox: "0 0 112 112", role: "img", "aria-label": `${label}: ${days == null ? "unknown" : days + " days left"}` });
+      const r = 46, len = 2 * Math.PI * r, f = days == null ? 0 : Math.max(.02, Math.min(1, days / max));
+      svg.append(sv("circle", { cx: 56, cy: 56, r, fill: "none", stroke: "var(--track)", "stroke-width": 10 }));
+      const fg = sv("circle", { cx: 56, cy: 56, r, fill: "none", stroke: colour, "stroke-width": 10, "stroke-linecap": "round", "stroke-dasharray": len, "stroke-dashoffset": len, transform: "rotate(-90 56 56)" });
+      fg.style.transition = "stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)"; svg.append(fg);
+      const t = sv("text", { x: 56, y: 60, "text-anchor": "middle", "font-size": days != null && days > 999 ? 22 : 28, "font-weight": 800 }); t.textContent = days == null ? "?" : days; svg.append(t);
+      const l = sv("text", { x: 56, y: 76, "text-anchor": "middle", class: "lbl" }); l.textContent = "DAYS LEFT"; svg.append(l);
+      raf2(() => fg.setAttribute("stroke-dashoffset", String(len * (1 - f))));
+      return svg;
+    }
+    const tone = (days, warn, bad) => days == null ? "var(--muted)" : days <= bad ? "var(--bad)" : days <= warn ? "var(--warn)" : "var(--good)";
+    function render(domain, data, isExample) {
+      out.replaceChildren();
+      const d = data.domain, c = data.cert;
+      const dd = d && !d.notFound ? daysUntil(d.expires) : null, cd = c && !c.none ? daysUntil(c.expires) : null;
+      const known = [dd, cd].filter(x => x != null), soonest = known.length ? Math.min(...known) : null;
+      const st = soonest == null ? "err" : soonest <= 14 ? "bad" : soonest <= 45 ? "warn" : "good";
+      dial.set({ value: soonest == null ? "?" : soonest, sub: "DAYS LEFT", colour: soonest == null ? "#ffffff" : soonest <= 14 ? "#ff8b77" : soonest <= 45 ? "#f3b75c" : "#6fd59c" });
+      const parts = [];
+      if (dd != null) parts.push(`the domain renews in ${dd} days`);
+      if (cd != null) parts.push(`the website certificate in ${cd} days`);
+      const title = parts.length ? `For ${domain}, ${parts.join(" and ")}` : `Couldn't read expiry dates for ${domain}`;
+      const body = st === "good" ? "Nothing is due soon. Make sure auto-renew stays switched on." : st === "warn" ? "Something is due in the next six weeks. Check it's set to renew automatically." : st === "bad" ? "Something expires very soon. Renew it now to avoid an outage." : "The registry or certificate logs didn't respond. Try again in a minute.";
+      out.append(verdict(st === "err" ? "warn" : st, st === "good" ? "Nothing due soon" : st === "warn" ? "Renewal coming up" : st === "bad" ? "Expiring soon" : "Partly checked", title, body, isExample));
+
+      const cds = el("div", "countdowns");
+      const card = (cap, days, max, warn, bad, main, sub) => { const k = el("div", "cd"); k.append(ring(days, max, cap, tone(days, warn, bad))); const tx = el("div"); tx.append(el("span", "cap", cap), el("b", null, main), el("span", null, sub)); k.append(tx); return k; };
+      cds.append(card("Domain registration", dd, 365, 60, 30, d && d.expires ? fmtDate(d.expires) : d && d.notFound ? "Not registered" : "Unknown", d && d.registrar ? "Registrar: " + d.registrar : "Registrar unknown"));
+      cds.append(card("Website certificate", cd, 90, 21, 7, c && c.expires ? fmtDate(c.expires) : c && c.none ? "No valid certificate" : "Unknown", c && c.issuer ? "Issued by " + c.issuer : "Issuer unknown"));
+      out.append(cds);
+
+      const checks = [];
+      checks.push(dd == null ? { status: "info", name: "Domain renewal", what: d && d.notFound ? "This domain isn't registered." : "The registry didn't return an expiry date.", label: "Unknown" }
+        : { status: dd > 60 ? "pass" : dd > 30 ? "warn" : "fail", name: "Domain renewal", what: dd > 60 ? `Renews on ${fmtDate(d.expires)}.` : `Due on ${fmtDate(d.expires)}. Renew now and check auto-renew is on.` });
+      if (d && !d.notFound) {
+        const isUk = /\.uk$/.test(domain), locked = d.status.some(x => /transfer ?prohibited/i.test(x));
+        checks.push(isUk ? { status: "info", name: "Transfer protection", what: "UK domains use Nominet's IPS tag system instead of a transfer lock. Keep your registrar account secured with MFA.", label: "UK domain" }
+          : { status: locked ? "pass" : "warn", name: "Transfer lock", what: locked ? "The domain can't be moved to another registrar without unlocking it first." : "No transfer lock. Turn it on at your registrar to stop the domain being stolen." });
+        checks.push({ status: d.dnssec ? "pass" : "warn", name: "DNSSEC", what: d.dnssec ? "Signed at the registry." : "Not enabled. Ask your registrar or DNS host to switch it on." });
+      }
+      checks.push(cd == null ? { status: c && c.none ? "fail" : "info", name: "Website certificate", what: c && c.none ? "No currently valid certificate covers this domain or its www address." : "Certificate logs didn't respond.", label: c && c.none ? "Missing" : "Unknown" }
+        : { status: cd > 21 ? "pass" : cd > 7 ? "warn" : "fail", name: "Website certificate", what: (cd > 21 ? `Valid until ${fmtDate(c.expires)}.` : `Expires on ${fmtDate(c.expires)}.`) + (/let's encrypt/i.test(c.issuer) ? " Let's Encrypt certificates last 90 days and usually renew automatically about 30 days before expiry." : "") });
+      const p1 = panel("Checks", "What could cause an outage or a takeover."); p1.append(checkList(checks));
+      const p2 = panel("Details", "From the domain registry and public certificate logs.");
+      const dl = el("dl", "kv");
+      const row = (k, v, code) => { dl.append(el("dt", null, k)); const dd2 = el("dd"); if (code) dd2.append(el("code", null, v)); else dd2.textContent = v; dl.append(dd2); };
+      if (d && !d.notFound) {
+        row("Registrar", d.registrar || "Unknown"); row("Registered", fmtDate(d.registered)); row("Expires", fmtDate(d.expires)); if (d.updated) row("Last changed", fmtDate(d.updated));
+        if (d.ns.length) row("Name servers", d.ns.join("\n"), true);
+        if (d.status.length) row("Status", d.status.join(", "));
+      }
+      if (c && !c.none) { row("Certificate issuer", c.issuer); row("Valid from", fmtDate(c.issued)); row("Valid until", fmtDate(c.expires)); row("Covers", c.names.join(", "), true); }
+      p2.append(dl);
+      const g2 = el("div", "grid2"); g2.append(p1, p2); out.append(g2);
+      out.append(stepsPanel("Avoid an outage", "Simple habits that prevent most expiry problems.", [
+        ["Turn on auto-renew", "for every domain, with a card on file that won't expire first."],
+        ["Use a shared contact", "put renewal notices to an address like it@ rather than one person's inbox."],
+        ["Secure the registrar account", "with MFA. Whoever controls it controls your email and website."],
+        ["Automate certificates", "most hosts renew them automatically; check yours does."]
+      ]));
+      out.append(cta("Steer IT can manage your domains and certificates for you, with renewals and alerts handled so nothing lapses."));
+    }
+    const SAMPLE = { domain: "northbay-accounts.co.uk", data: {
+      domain: { expires: new Date(Date.now() + 38 * DAY).toISOString(), registered: "2014-03-11T10:20:00Z", updated: "2025-03-04T09:00:00Z", registrar: "Fasthosts Internet Ltd", status: ["active"], ns: ["ns1.livedns.co.uk", "ns2.livedns.co.uk", "ns3.livedns.co.uk"], dnssec: false },
+      cert: { expires: new Date(Date.now() + 61 * DAY).toISOString(), issued: new Date(Date.now() - 29 * DAY).toISOString(), issuer: "Let's Encrypt", names: ["northbay-accounts.co.uk", "www.northbay-accounts.co.uk"] } } };
+    let busy = false;
+    async function run(domain, btn) {
+      if (busy) return; busy = true; btn.disabled = true;
+      loading(`Checking the registry and certificate logs for ${domain}… This can take up to 20 seconds.`); dial.set({ scanning: true });
+      try {
+        const data = await fetchData(domain);
+        if (!data.domain && !data.cert) { dial.set(); return errorBox("Couldn't check expiry dates", NET_ERR); }
+        render(domain, data, false);
+      } finally { busy = false; btn.disabled = false; }
+    }
+    function mount() {
+      const f = searchForm({ id: "expiry-input", label: "Domain", placeholder: "yourcompany.co.uk", button: "Check expiry", inputmode: "url" });
+      dial = buildHero({ eyebrow: "Expiry check", title: 'When does your domain <span class="hl">run out</span>?', lede: "Shows when the domain and its website certificate expire, who the registrar is and whether the domain is protected against theft. Expired domains take websites and email offline.", form: f.form,
+        fine: [document.createTextNode("Reads the public domain registry (RDAP) and certificate transparency logs. "), exLink("See an example result", () => { f.input.value = SAMPLE.domain; render(SAMPLE.domain, SAMPLE.data, true); })] });
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const h = cleanHost(f.input.value).replace(/^www\./, "");
+        if (!validHost(h)) { errorBox("That doesn't look like a domain", "Enter a domain like yourcompany.co.uk."); f.input.focus(); return; }
+        f.input.value = h; run(h, f.button); });
+      render(SAMPLE.domain, SAMPLE.data, true);
+      foot.replaceChildren(el("div", null, "Registration data from RDAP, the registries' public lookup service (Nominet for .uk). Certificate dates come from public certificate logs and show the newest valid certificate issued, which is almost always the one in use."));
+      const pre = takePrefill("expiry"); if (pre) { f.input.value = pre; run(pre, f.button); }
+    }
+    return { mount, fetchData, score, issues, SAMPLE, daysUntil };
+  })();
+
+  // ================= Tool: Full domain report =================
+  const Report = (() => {
+    let dial;
+    const SECTIONS = [
+      { key: "email", name: "Email security", hint: "SPF, DKIM, DMARC and MTA-STS", route: "domain", weight: 40 },
+      { key: "web", name: "Website security", hint: "Browser protections graded by Mozilla", route: "website", weight: 25 },
+      { key: "renew", name: "Renewals", hint: "Domain and certificate expiry", route: "expiry", weight: 20 },
+      { key: "dns", name: "DNS hardening", hint: "DNSSEC and certificate lock (CAA)", route: "dns", weight: 15 }
+    ];
+    const letter = (s) => s >= 85 ? "A" : s >= 70 ? "B" : s >= 55 ? "C" : s >= 40 ? "D" : "F";
+    const colourOf = (s) => s == null ? "var(--muted)" : s >= 70 ? "var(--good)" : s >= 50 ? "var(--warn)" : "var(--bad)";
+    function compute(r) {
+      const sc = {}, fixes = [];
+      if (r.email) {
+        sc.email = Domain.grade(r.email);
+        r.email.filter(c => (c.status === "fail" || c.status === "warn") && c.key !== "dnssec").forEach(c => fixes.push({ status: c.status, name: c.name, what: c.what }));
+      }
+      if (r.web) {
+        const o = r.web.obs;
+        sc.web = o ? Math.max(0, Math.min(100, o.score)) : null;
+        if (o && !/^[AB]/.test(o.grade)) fixes.push({ status: /^C/.test(o.grade) ? "warn" : "fail", name: `Website security grade ${o.grade}`, what: `${o.tests_failed} of ${o.tests_quantity} browser protection tests failed, such as HTTPS enforcement and a Content Security Policy.` });
+        sc.dns = 40 + (r.web.ad ? 35 : 0) + (r.web.caa.length ? 25 : 0);
+        if (!r.web.ad) fixes.push({ status: "warn", name: "DNSSEC not enabled", what: "DNS answers for the domain aren't signed. Ask the registrar or DNS host to switch it on." });
+        if (!r.web.caa.length) fixes.push({ status: "info", name: "No CAA record", what: "Any certificate authority could issue a certificate for the domain." });
+      }
+      if (r.exp) { sc.renew = Expiry.score(r.exp); Expiry.issues(r.exp).forEach(x => fixes.push(x)); }
+      let tw = 0, tot = 0; SECTIONS.forEach(s => { if (sc[s.key] != null) { tw += s.weight; tot += s.weight * sc[s.key]; } });
+      const overall = tw ? Math.round(tot / tw) : null;
+      const rank = { fail: 0, warn: 1, info: 2 };
+      fixes.sort((a, b) => rank[a.status] - rank[b.status]);
+      return { sc, overall, fixes };
+    }
+    function badge(L, score) {
+      const svg = sv("svg", { viewBox: "0 0 150 150", class: "lettergrade", role: "img", "aria-label": `Overall grade ${L}, ${score} out of 100` });
+      const r = 60, len = 2 * Math.PI * r, col = colourOf(score);
+      svg.append(sv("circle", { cx: 75, cy: 75, r, fill: "none", stroke: "var(--track)", "stroke-width": 13 }));
+      const fg = sv("circle", { cx: 75, cy: 75, r, fill: "none", stroke: col, "stroke-width": 13, "stroke-linecap": "round", "stroke-dasharray": len, "stroke-dashoffset": len, transform: "rotate(-90 75 75)" });
+      fg.style.transition = "stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)"; svg.append(fg);
+      const t = sv("text", { x: 75, y: 89, "text-anchor": "middle", "font-size": 48, "font-weight": 800 }); t.textContent = L; svg.append(t);
+      const l = sv("text", { x: 75, y: 110, "text-anchor": "middle", class: "lbl" }); l.textContent = score + " / 100"; svg.append(l);
+      raf2(() => fg.setAttribute("stroke-dashoffset", String(len * (1 - Math.max(.02, score / 100)))));
+      return svg;
+    }
+    function render(domain, r, isExample) {
+      out.replaceChildren();
+      const { sc, overall, fixes } = compute(r);
+      if (overall == null) { dial.set(); return errorBox("Couldn't build a report", NET_ERR); }
+      const L = letter(overall);
+      dial.set({ value: L, sub: "OVERALL", colour: overall >= 70 ? "#6fd59c" : overall >= 50 ? "#f3b75c" : "#ff8b77", blips: fixes.filter(f => f.status !== "info").length });
+      const st = overall >= 70 ? "good" : overall >= 50 ? "warn" : "bad";
+      const nFix = fixes.filter(f => f.status === "fail").length, nWarn = fixes.filter(f => f.status === "warn").length;
+      out.append(verdict(st, st === "good" ? "In good shape" : st === "warn" ? "Room to improve" : "Needs attention",
+        `${domain} scores ${L} overall`,
+        `${nFix ? nFix + " serious issue" + (nFix === 1 ? "" : "s") + " and " : ""}${nWarn} improvement${nWarn === 1 ? "" : "s"} found across email, website, renewals and DNS.`,
+        isExample, badge(L, overall)));
+      if (r.who) {
+        const who = el("div", "who-runs");
+        [["Email", r.who.mailHost], ["Website", r.who.webHost], ["DNS hosting", r.who.dnsHost], ["Registrar", r.exp && r.exp.domain && r.exp.domain.registrar || "Unknown"]]
+          .forEach(([k, v]) => { const d = el("div"); d.append(el("span", null, k), el("b", null, v)); who.append(d); });
+        out.append(who);
+      }
+      const p = panel("Scores by area", "Tap an area to open the full check for this domain."), list = el("div", "secs"), fills = [];
+      SECTIONS.forEach(s => {
+        const v = sc[s.key], row = el("div", "sec-row");
+        row.dataset.text = `${s.name}: ${v == null ? "not checked" : v + "/100"}`;
+        const nm = el("div", "nm"); nm.append(document.createTextNode(s.name));
+        const tr = el("div", "t"), fi = el("i"); fi.style.background = colourOf(v); tr.append(fi); nm.append(tr, el("small", null, s.hint));
+        const scEl = el("div", "sc" + (v == null ? " na" : ""), v == null ? "Not checked" : String(v)); if (v != null) scEl.style.color = colourOf(v);
+        const b = el("button", null, "Full check →"); b.type = "button";
+        b.addEventListener("click", () => { PREFILL = isExample ? null : { route: s.route, value: domain }; go(s.route, true); });
+        row.append(nm, scEl, b); list.append(row); if (v != null) fills.push([fi, v]);
+      });
+      p.append(list); out.append(p);
+      raf2(() => fills.forEach(([fi, v]) => fi.style.width = Math.max(3, v) + "%"));
+      if (!isExample) {
+        const sb = el("button", "sharebtn", Store.has(domain) ? "Saved to My domains · Update" : "Save to My domains"); sb.type = "button";
+        sb.addEventListener("click", () => {
+          Store.upsert(domain, { at: new Date().toISOString(), overall, letter: L, sc, fails: fixes.filter(f => f.status === "fail").length, warns: fixes.filter(f => f.status === "warn").length,
+            expiry: r.exp ? { domain: r.exp.domain && r.exp.domain.expires || null, cert: r.exp.cert && r.exp.cert.expires || null } : null });
+          sb.textContent = "Saved to My domains ✓";
+        });
+        out.querySelector(".verdict .txt").append(sb);
+      }
+      const pf = panel("Top things to fix", "Most important first.");
+      pf.append(checkList(fixes.length ? fixes.slice(0, 8) : [{ status: "pass", name: "Nothing urgent found", what: "Keep monitoring: run this report every few months." }]));
+      out.append(pf);
+      out.append(cta("Want these fixed? Steer IT can sort the issues above, then keep watching your domain so problems are caught early."));
+    }
+    function sample() {
+      return { email: Domain.sample(), web: Website.SAMPLE.data, who: Dns.sampleSummary(), exp: Expiry.SAMPLE.data };
+    }
+    let busy = false;
+    async function fetchReport(domain) {
+      const [email, web, who, exp] = await Promise.allSettled([Domain.fetchChecks(domain), Website.fetchData(domain), Dns.quickSummary(domain), Expiry.fetchData(domain)]);
+      const val = (x) => x.status === "fulfilled" ? x.value : null;
+      if (email.status === "fulfilled" && email.value === null) return { nx: true };
+      const w = val(web), ex = val(exp);
+      return { email: val(email), web: w && w.data ? w.data : null, who: val(who), exp: ex && (ex.domain || ex.cert) ? ex : null };
+    }
+    async function run(domain, btn) {
+      if (busy) return; busy = true; btn.disabled = true;
+      loading(`Running email, website, renewal and DNS checks on ${domain}… This takes about 20 to 30 seconds.`); dial.set({ scanning: true });
+      try {
+        const r = await fetchReport(domain);
+        if (r.nx) { dial.set(); return errorBox("That domain doesn't exist", `No DNS records were found for ${domain}. Check the spelling.`); }
+        render(domain, r, false);
+      } catch { dial.set(); errorBox("Couldn't build a report", NET_ERR); }
+      finally { busy = false; btn.disabled = false; }
+    }
+    function mount() {
+      const f = searchForm({ id: "report-input", label: "Domain", placeholder: "yourcompany.co.uk", button: "Run report", inputmode: "url" });
+      dial = buildHero({ eyebrow: "Full domain report", title: 'One domain. <span class="hl">One grade.</span>', lede: "Runs the email security, website, renewal and DNS checks together and gives the domain an overall grade, with the most important fixes first. Ideal for a quick look in a meeting.", form: f.form,
+        fine: [document.createTextNode("Passive checks using public data only. "), exLink("See an example result", () => { f.input.value = "northbay-accounts.co.uk"; render("northbay-accounts.co.uk", sample(), true); })] });
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const h = cleanHost(f.input.value).replace(/^www\./, "");
+        if (!validHost(h)) { errorBox("That doesn't look like a domain", "Enter a domain like yourcompany.co.uk, or an email address on it."); f.input.focus(); return; }
+        f.input.value = h; run(h, f.button); });
+      render("northbay-accounts.co.uk", sample(), true);
+      foot.replaceChildren(el("div", null, "Overall grade weights email security 40%, website security 25%, renewals 20% and DNS hardening 15%. Areas that couldn't be checked are left out of the grade rather than counted as failures."));
+      const pre = takePrefill("report"); if (pre) { f.input.value = pre; run(pre, f.button); }
+    }
+    return { mount, fetchReport, compute, letter };
+  })();
+
+  // ================= Shared: copy button and saved domains store =================
+  function copyButton(getText, label) {
+    const b = el("button", "copybtn", label || "Copy"); b.type = "button";
+    b.addEventListener("click", async () => {
+      const t = typeof getText === "function" ? getText() : getText;
+      try { await navigator.clipboard.writeText(t); b.textContent = "Copied"; }
+      catch { b.textContent = "Select and copy"; }
+      setTimeout(() => b.textContent = label || "Copy", 1600);
+    });
+    return b;
+  }
+  const Store = (() => {
+    const KEY = "steer-toolkit-domains-v1"; let mem = null;
+    function load() { if (mem) return mem; try { mem = JSON.parse(localStorage.getItem(KEY) || "[]"); if (!Array.isArray(mem)) mem = []; } catch { mem = mem || []; } return mem; }
+    function save(list) { mem = list; try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {} }
+    function upsert(domain, result) {
+      const list = load(), i = list.findIndex(x => x.domain === domain);
+      const entry = i >= 0 ? list[i] : { domain, added: new Date().toISOString(), last: null, prev: null };
+      if (result) { if (entry.last) entry.prev = { letter: entry.last.letter, overall: entry.last.overall, at: entry.last.at }; entry.last = result; }
+      if (i >= 0) list[i] = entry; else list.unshift(entry);
+      save(list); return entry;
+    }
+    function remove(domain) { save(load().filter(x => x.domain !== domain)); }
+    const has = (domain) => load().some(x => x.domain === domain);
+    return { load, upsert, remove, has };
+  })();
+
+  // ================= Tool: DNS record builder =================
+  const Builder = (() => {
+    let dial, tab = "spf", domain = "", published = null;
+    const SENDERS = [
+      ["m365", "Microsoft 365", "include:spf.protection.outlook.com"], ["google", "Google Workspace", "include:_spf.google.com"],
+      ["xero", "Xero", "include:_spf.xero.com"], ["mailchimp", "Mailchimp", "include:servers.mcsv.net"],
+      ["sendgrid", "SendGrid", "include:sendgrid.net"], ["zoho", "Zoho Mail (EU)", "include:zoho.eu"],
+      ["mailgun", "Mailgun", "include:mailgun.org"], ["ses", "Amazon SES", "include:amazonses.com"],
+      ["mx", "Our own mail servers", "mx"], ["a", "Our web server sends email", "a"]
+    ];
+    const CAS = [["letsencrypt.org", "Let's Encrypt"], ["digicert.com", "DigiCert"], ["sectigo.com", "Sectigo (and ZeroSSL)"], ["globalsign.com", "GlobalSign"], ["pki.goog", "Google Trust Services"], ["amazon.com", "Amazon"]];
+    const S = {
+      spf: { senders: new Set(["m365"]), extra: "", all: "~all" },
+      dmarc: { p: "none", pct: 100, rua: "", ruf: "", sp: "", strict: false },
+      sts: { mode: "testing", mx: "", maxAge: 604800, tlsrpt: "" },
+      caa: { cas: new Set(["letsencrypt.org"]), wild: true, iodef: "" }
+    };
+    const D = () => domain || "yourcompany.co.uk";
+
+    function cbox(id, label, sub, checked, onChange) {
+      const l = el("label", "cbox"); const i = el("input"); i.type = "checkbox"; i.id = id; i.checked = checked;
+      i.addEventListener("change", () => onChange(i.checked));
+      const sp = el("span", null, label); if (sub) sp.append(el("small", null, sub));
+      l.append(i, sp); return l;
+    }
+    function seg(options, value, onPick) {
+      const w = el("div", "seg");
+      const bs = options.map(([v, label]) => { const b = el("button", "chipbtn", label); b.type = "button"; b.setAttribute("aria-pressed", String(v === value)); b.addEventListener("click", () => { bs.forEach(x => x.setAttribute("aria-pressed", String(x === b))); onPick(v); }); w.append(b); return b; });
+      return w;
+    }
+    function field(id, label, input) { const f = el("div", "field2"); const l = el("label", null, label); l.htmlFor = id; input.id = id; f.append(l, input); return f; }
+    function textInput(value, ph, onInput) { const i = el("input"); i.type = "text"; i.value = value; i.placeholder = ph; i.spellcheck = false; i.setAttribute("autocapitalize", "off"); i.addEventListener("input", () => onInput(i.value.trim())); return i; }
+    function recBox(rows, note) {
+      const box = el("div", "recout");
+      rows.forEach(([k, v, copy]) => { const r = el("div", "r"); r.append(el("span", "k", k), el("code", null, v)); r.append(copy ? copyButton(v) : el("span")); box.append(r); });
+      const w = el("div"); w.append(box); if (note) w.append(el("p", "note", note)); return w;
+    }
+
+    // ---- record makers ----
+    function spf() {
+      const mechs = SENDERS.filter(s => S.spf.senders.has(s[0])).map(s => s[2]);
+      S.spf.extra.split(/[\s,]+/).filter(Boolean).forEach(t => {
+        if (/^(ip4|ip6|include|a|mx|exists):?/i.test(t)) mechs.push(t);
+        else if (/^\d{1,3}(\.\d{1,3}){3}(\/\d{1,2})?$/.test(t)) mechs.push("ip4:" + t);
+        else if (t.includes(":")) mechs.push("ip6:" + t);
+        else if (/\./.test(t)) mechs.push("include:" + t);
+      });
+      const uniq = [...new Set(mechs)];
+      const value = uniq.length ? `v=spf1 ${uniq.join(" ")} ${S.spf.all}` : "v=spf1 -all";
+      const lookups = uniq.filter(m => /^(include:|a$|a:|mx$|mx:|exists:)/i.test(m)).length;
+      return { value, lookups, empty: !uniq.length };
+    }
+    function dmarc() {
+      const d = S.dmarc, rua = d.rua || `dmarc@${D()}`;
+      const tags = [`v=DMARC1`, `p=${d.p}`];
+      if (d.sp && d.sp !== d.p) tags.push(`sp=${d.sp}`);
+      if (d.pct < 100 && d.p !== "none") tags.push(`pct=${d.pct}`);
+      tags.push(`rua=mailto:${rua}`);
+      if (d.ruf) tags.push(`ruf=mailto:${d.ruf}`, "fo=1");
+      if (d.strict) tags.push("adkim=s", "aspf=s");
+      const external = [rua, d.ruf].filter(Boolean).some(a => !a.toLowerCase().endsWith("@" + D()) && !a.toLowerCase().endsWith("." + D()));
+      return { value: tags.join("; "), external };
+    }
+    function sts() {
+      const id = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 12);
+      const mx = S.sts.mx.split(/[\s,]+/).map(x => x.replace(/\.$/, "")).filter(Boolean);
+      const policy = ["version: STSv1", `mode: ${S.sts.mode}`, ...(mx.length ? mx : [`${D().replace(/\./g, "-")}.mail.protection.outlook.com`]).map(m => `mx: ${m}`), `max_age: ${S.sts.maxAge}`].join("\n");
+      return { txt: `v=STSv1; id=${id}`, tls: `v=TLSRPTv1; rua=mailto:${S.sts.tlsrpt || "tls-reports@" + D()}`, policy };
+    }
+    function caa() {
+      const rows = [...S.caa.cas].map(c => `0 issue "${c}"`);
+      if (!S.caa.wild) rows.push(`0 issuewild ";"`);
+      if (S.caa.iodef) rows.push(`0 iodef "mailto:${S.caa.iodef}"`);
+      return rows;
+    }
+
+    // ---- option panels ----
+    function optionsPanel(refresh) {
+      const p = panel({ spf: "Who sends email for this domain?", dmarc: "DMARC settings", sts: "MTA-STS settings", caa: "Which certificate authorities do you use?" }[tab],
+        { spf: "Tick every service that sends email using your address, including invoicing and newsletter tools.", dmarc: "Start at 'none' to collect reports, then tighten once every sender passes.", sts: "Forces other mail servers to use encryption when delivering to you.", caa: "Only these will be allowed to issue HTTPS certificates for the domain." }[tab]);
+      const box = el("div", "opts");
+      if (tab === "spf") {
+        const g = el("div", "checks-grid");
+        SENDERS.forEach(([id, label, mech]) => g.append(cbox("spf-" + id, label, mech, S.spf.senders.has(id), (on) => { on ? S.spf.senders.add(id) : S.spf.senders.delete(id); refresh(); })));
+        box.append(g);
+        box.append(field("spf-extra", "Other servers or services (optional)", textInput(S.spf.extra, "e.g. 203.0.113.10 include:mail.example.net", (v) => { S.spf.extra = v; refresh(); })));
+        const f = el("div", "field2"); f.append(el("label", null, "Email from anywhere else should be"));
+        f.append(seg([["~all", "Marked as suspicious (~all)"], ["-all", "Rejected (-all)"]], S.spf.all, (v) => { S.spf.all = v; refresh(); })); box.append(f);
+      } else if (tab === "dmarc") {
+        const f = el("div", "field2"); f.append(el("label", null, "Policy for email that fails checks"));
+        f.append(seg([["none", "Monitor only"], ["quarantine", "Send to junk"], ["reject", "Reject"]], S.dmarc.p, (v) => { S.dmarc.p = v; refresh(); })); box.append(f);
+        const row = el("div", "fields2");
+        row.append(field("dm-rua", "Send summary reports to", textInput(S.dmarc.rua, `dmarc@${D()}`, (v) => { S.dmarc.rua = v; refresh(); })));
+        const pct = el("input"); pct.type = "number"; pct.min = 1; pct.max = 100; pct.value = S.dmarc.pct; pct.addEventListener("input", () => { S.dmarc.pct = Math.max(1, Math.min(100, parseInt(pct.value, 10) || 100)); refresh(); });
+        row.append(field("dm-pct", "Apply policy to this % of failing mail", pct));
+        const sp = el("select"); [["", "Same as main domain"], ["none", "Monitor only"], ["quarantine", "Send to junk"], ["reject", "Reject"]].forEach(([v, t]) => { const o = el("option", null, t); o.value = v; if (v === S.dmarc.sp) o.selected = true; sp.append(o); });
+        sp.addEventListener("change", () => { S.dmarc.sp = sp.value; refresh(); });
+        row.append(field("dm-sp", "Subdomains", sp));
+        row.append(field("dm-ruf", "Failure reports to (optional)", textInput(S.dmarc.ruf, "Leave blank (few providers send these)", (v) => { S.dmarc.ruf = v; refresh(); })));
+        box.append(row);
+        box.append(cbox("dm-strict", "Strict alignment", "adkim=s; aspf=s. Only if every sender uses your exact domain", S.dmarc.strict, (on) => { S.dmarc.strict = on; refresh(); }));
+      } else if (tab === "sts") {
+        const f = el("div", "field2"); f.append(el("label", null, "Mode"));
+        f.append(seg([["testing", "Testing (report only)"], ["enforce", "Enforce"]], S.sts.mode, (v) => { S.sts.mode = v; refresh(); })); box.append(f);
+        const ta = el("textarea"); ta.rows = 3; ta.value = S.sts.mx; ta.placeholder = `${D().replace(/\./g, "-")}.mail.protection.outlook.com`; ta.spellcheck = false; ta.addEventListener("input", () => { S.sts.mx = ta.value; refresh(); });
+        box.append(field("sts-mx", "Your mail servers (MX), one per line", ta));
+        const row = el("div", "fields2");
+        const ma = el("select"); [[86400, "1 day"], [604800, "1 week"], [1209600, "2 weeks"], [31557600, "1 year"]].forEach(([v, t]) => { const o = el("option", null, t); o.value = v; if (v === S.sts.maxAge) o.selected = true; ma.append(o); });
+        ma.addEventListener("change", () => { S.sts.maxAge = parseInt(ma.value, 10); refresh(); });
+        row.append(field("sts-age", "Remember the policy for", ma));
+        row.append(field("sts-rpt", "Send TLS reports to", textInput(S.sts.tlsrpt, `tls-reports@${D()}`, (v) => { S.sts.tlsrpt = v; refresh(); })));
+        box.append(row);
+      } else {
+        const g = el("div", "checks-grid");
+        CAS.forEach(([id, label]) => g.append(cbox("caa-" + id, label, id, S.caa.cas.has(id), (on) => { on ? S.caa.cas.add(id) : S.caa.cas.delete(id); refresh(); })));
+        box.append(g);
+        box.append(cbox("caa-wild", "Allow wildcard certificates", "Certificates covering *." + D(), S.caa.wild, (on) => { S.caa.wild = on; refresh(); }));
+        box.append(field("caa-iodef", "Email about refused certificate requests (optional)", textInput(S.caa.iodef, `security@${D()}`, (v) => { S.caa.iodef = v; refresh(); })));
+      }
+      p.append(box); return p;
+    }
+    function outputPanel() {
+      const p = panel("Add this to your DNS", `Log in to the DNS host for ${D()} and create ${tab === "caa" ? "these records" : tab === "sts" ? "these records and the policy file" : "this record"}.`);
+      if (tab === "spf") {
+        const r = spf();
+        p.append(recBox([["Host", "@", false], ["Type", "TXT", false], ["Value", r.value, true]],
+          r.empty ? "No senders ticked, so this says the domain never sends email. Use it on domains that don't send email." : "A domain can only have one SPF record. Replace the existing one rather than adding a second."));
+        if (r.lookups > 7) p.append(el("p", "note warnnote", `This uses about ${r.lookups} DNS lookups before counting the ones inside each service. SPF fails above 10, so test it after publishing.`));
+      } else if (tab === "dmarc") {
+        const r = dmarc();
+        p.append(recBox([["Host", "_dmarc", false], ["Type", "TXT", false], ["Value", r.value, true]],
+          S.dmarc.p === "none" ? "Monitor only: nothing is blocked yet. Review the reports for 2 to 4 weeks, then move to 'Send to junk'." : S.dmarc.p === "quarantine" ? "Failing email goes to junk. Once reports look clean, move to 'Reject'." : "Full protection: fake email using your domain is refused."));
+        if (r.external) p.append(el("p", "note warnnote", "Reports are going to a different domain. That domain must publish an authorisation record, which most DMARC reporting services do for you."));
+      } else if (tab === "sts") {
+        const r = sts();
+        p.append(recBox([["Host", "_mta-sts", false], ["Type", "TXT", false], ["Value", r.txt, true]]));
+        p.append(recBox([["Host", "_smtp._tls", false], ["Type", "TXT", false], ["Value", r.tls, true]]));
+        p.append(recBox([["File", `https://mta-sts.${D()}/.well-known/mta-sts.txt`, true], ["Content", r.policy, true]],
+          "The policy file must be served over HTTPS at that exact address, so you'll also need an mta-sts subdomain pointing at a web host. Change the id in the first record whenever you change the policy."));
+      } else {
+        const rows = caa();
+        if (!rows.length || !S.caa.cas.size) p.append(el("p", "note warnnote", "Tick at least one certificate authority, or nobody will be able to issue a certificate for your website."));
+        rows.forEach(v => p.append(recBox([["Host", "@", false], ["Type", "CAA", false], ["Value", v, true]])));
+        p.append(el("p", "note", "Check which authority issues your current certificate first (the Expiry check shows it). If your site is behind Cloudflare, Cloudflare adds its own authorities automatically."));
+      }
+      if (published) {
+        const cur = { spf: published.spf, dmarc: published.dmarc, sts: [published.sts, published.tls].filter(Boolean).join("\n"), caa: published.caa.join("\n") }[tab];
+        const c = el("div", "current"); c.append(el("b", null, `Currently published for ${domain}: `));
+        c.append(cur ? el("code", null, cur) : document.createTextNode("nothing yet."));
+        p.append(c);
+      }
+      return p;
+    }
+    function render() {
+      out.replaceChildren();
+      const tabs = el("div", "filters");
+      [["spf", "SPF"], ["dmarc", "DMARC"], ["sts", "MTA-STS"], ["caa", "CAA"]].forEach(([t, label]) => {
+        const b = el("button", "chipbtn", label); b.type = "button"; b.setAttribute("aria-pressed", String(t === tab));
+        b.addEventListener("click", () => { tab = t; render(); }); tabs.append(b);
+      });
+      const intro = { spf: "SPF lists the services allowed to send email as your domain.", dmarc: "DMARC tells receivers what to do with email that fails SPF and DKIM, and sends you reports.", sts: "MTA-STS makes other mail servers use encryption when delivering to you.", caa: "CAA limits which companies can issue HTTPS certificates for your domain." }[tab];
+      const head = el("div", "panel"); head.append(tabs, el("p", "hint", intro)); head.lastChild.style.margin = "12px 0 0";
+      out.append(head);
+      const outSlot = el("div");
+      const refresh = () => outSlot.replaceChildren(outputPanel());
+      const g2 = el("div", "grid2"); g2.append(optionsPanel(refresh), outSlot); refresh();
+      out.append(g2);
+      out.append(cta("Not sure what to pick? Steer IT can set these records up and check every sender before switching on enforcement."));
+    }
+    async function load(d, btn) {
+      btn.disabled = true; dial.set({ scanning: true });
+      try {
+        const txt = (n) => dns(n, "TXT").then(r => answers(r, "TXT")).catch(() => []);
+        const [base, dm, mx, caaR, stsT, tlsT] = await Promise.all([txt(d), txt("_dmarc." + d), dns(d, "MX").then(r => answers(r, "MX")).catch(() => []), dns(d, "CAA").then(r => answers(r, "CAA")).catch(() => []), txt("_mta-sts." + d), txt("_smtp._tls." + d)]);
+        domain = d;
+        published = { spf: base.find(t => /^v=spf1/i.test(t)) || null, dmarc: dm.find(t => /^v=DMARC1/i.test(t)) || null, caa: caaR, sts: stsT.find(t => /^v=STSv1/i.test(t)) || null, tls: tlsT.find(t => /^v=TLSRPTv1/i.test(t)) || null };
+        if (published.spf) {
+          S.spf.senders = new Set(SENDERS.filter(s => new RegExp("(^|\\s)" + s[2].replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\s|$)", "i").test(published.spf)).map(s => s[0]));
+          const known = new Set(SENDERS.map(s => s[2].toLowerCase()));
+          S.spf.extra = published.spf.split(/\s+/).slice(1).filter(m => !/^[-~?+]?all$/i.test(m) && !known.has(m.toLowerCase())).join(" ");
+          S.spf.all = /-all\b/.test(published.spf) ? "-all" : "~all";
+        }
+        if (published.dmarc) {
+          const tag = (k) => ((published.dmarc.match(new RegExp("\\b" + k + "=([^;]+)", "i")) || [])[1] || "").trim();
+          S.dmarc.p = (tag("p") || "none").toLowerCase(); S.dmarc.sp = (tag("sp") || "").toLowerCase(); S.dmarc.pct = parseInt(tag("pct"), 10) || 100;
+          S.dmarc.rua = tag("rua").replace(/^mailto:/i, "").split(",")[0]; S.dmarc.ruf = tag("ruf").replace(/^mailto:/i, "").split(",")[0]; S.dmarc.strict = /adkim=s/i.test(published.dmarc);
+        } else S.dmarc.rua = "";
+        S.sts.mx = mx.map(x => x.split(/\s+/).pop().replace(/\.$/, "")).join("\n");
+        const cas = caaR.map(r => (r.match(/issue "?([^";\s]+)/i) || [])[1]).filter(Boolean);
+        if (cas.length) S.caa.cas = new Set(cas);
+        dial.set({ value: "✓", sub: "LOADED", colour: "#6fd59c" });
+        render();
+      } catch { dial.set(); errorBox("Couldn't read the current records", NET_ERR); }
+      finally { btn.disabled = false; }
+    }
+    function mount() {
+      const f = searchForm({ id: "builder-input", label: "Domain", placeholder: "yourcompany.co.uk", button: "Load current records", inputmode: "url" });
+      dial = buildHero({ eyebrow: "Record builder", title: 'Build the <span class="hl">right records</span>, first time.', lede: "Create SPF, DMARC, MTA-STS and CAA records from a few simple choices, ready to paste into your DNS host. Load a domain to start from what's published now.", form: f.form,
+        fine: [document.createTextNode("Loading reads public DNS only. Nothing is changed until you add the records yourself.")] });
+      dial.set({ value: "4", sub: "RECORD TYPES" });
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const h = cleanHost(f.input.value).replace(/^www\./, "");
+        if (!validHost(h)) { errorBox("That doesn't look like a domain", "Enter a domain like yourcompany.co.uk."); f.input.focus(); return; }
+        f.input.value = h; load(h, f.button); });
+      if (domain) f.input.value = domain;
+      render();
+      foot.replaceChildren(el("div", null, "Records are generated in your browser. Always keep a copy of the existing record before replacing it, and test with the Email security check after publishing."));
+      const pre = takePrefill("builder"); if (pre) { f.input.value = pre; load(pre, f.button); }
     }
     return { mount };
   })();
+
+  // ================= Tool: Blacklist check =================
+  const Blacklist = (() => {
+    let dial;
+    // Each list is first tested with its own published test entry. If the test entry doesn't show as listed,
+    // the list is refusing lookups from public DNS services and is reported as "couldn't check".
+    const IP_LISTS = [
+      { id: "spamhaus", name: "Spamhaus ZEN", zone: "zen.spamhaus.org", delist: "https://check.spamhaus.org/" },
+      { id: "spamcop", name: "SpamCop", zone: "bl.spamcop.net", delist: "https://www.spamcop.net/bl.shtml" },
+      { id: "barracuda", name: "Barracuda", zone: "b.barracudacentral.org", delist: "https://www.barracudacentral.org/lookups" },
+      { id: "uceprotect", name: "UCEPROTECT", zone: "dnsbl-1.uceprotect.net", delist: "https://www.uceprotect.net/en/rblcheck.php" },
+      { id: "psbl", name: "PSBL", zone: "psbl.surriel.com", delist: "https://psbl.org/" },
+      { id: "mailspike", name: "Mailspike", zone: "bl.mailspike.net", delist: "https://mailspike.org/" },
+      { id: "dronebl", name: "DroneBL", zone: "dnsbl.dronebl.org", delist: "https://dronebl.org/lookup" }
+    ];
+    const DOMAIN_LISTS = [
+      { id: "dbl", name: "Spamhaus DBL", zone: "dbl.spamhaus.org", test: "dbltest.com", delist: "https://check.spamhaus.org/" },
+      { id: "surbl", name: "SURBL", zone: "multi.surbl.org", test: "test.surbl.org", delist: "https://www.surbl.org/surbl-analysis" },
+      { id: "uribl", name: "URIBL", zone: "multi.uribl.com", test: "test.uribl.com", delist: "https://admin.uribl.com/" }
+    ];
+    const isIp = (s) => /^\d{1,3}(\.\d{1,3}){3}$/.test(s) && s.split(".").every(n => +n <= 255);
+    const rev = (ip) => ip.split(".").reverse().join(".");
+    // "listed" | "clean" | "unknown"
+    async function query(name, domainList) {
+      try {
+        const r = await dns(name, "A");
+        if (r.Status === 3) return "clean";
+        if (r.Status !== 0) return "unknown";
+        const a = answers(r, "A");
+        if (!a.length) return "clean";
+        if (a.some(x => /^127\.255\.255\./.test(x) || (domainList && x === "127.0.0.1"))) return "unknown";
+        return a.some(x => /^127\./.test(x)) ? "listed" : "unknown";
+      } catch { return "unknown"; }
+    }
+    async function fetchData(input) {
+      let targets = [], domain = null;
+      if (isIp(input)) targets = [{ ip: input, label: "Entered address" }];
+      else {
+        domain = input;
+        const [mxR, txtR] = await Promise.all([dns(domain, "MX").catch(() => null), dns(domain, "TXT").catch(() => null)]);
+        if (mxR && mxR.Status === 3) return { nx: true };
+        const mxHosts = answers(mxR, "MX").map(x => x.split(/\s+/).pop().replace(/\.$/, "")).filter(Boolean).slice(0, 4);
+        const aRes = await Promise.all(mxHosts.map(h => dns(h, "A").then(r => answers(r, "A")).catch(() => [])));
+        mxHosts.forEach((h, i) => aRes[i].slice(0, 2).forEach(ip => targets.push({ ip, label: "Mail server " + h })));
+        const spfRec = answers(txtR, "TXT").find(t => /^v=spf1/i.test(t)) || "";
+        (spfRec.match(/ip4:(\d{1,3}(?:\.\d{1,3}){3})(?:\/32)?(?=\s|$)/gi) || []).forEach(m => targets.push({ ip: m.replace(/^ip4:/i, "").replace(/\/32$/, ""), label: "Sending server in SPF" }));
+        const seen = new Set(); targets = targets.filter(t => isIp(t.ip) && !seen.has(t.ip) && seen.add(t.ip)).slice(0, 8);
+      }
+      const canaryIp = await Promise.all(IP_LISTS.map(l => query("2.0.0.127." + l.zone, false)));
+      const canaryDom = await Promise.all(DOMAIN_LISTS.map(l => query(l.test + "." + l.zone, true)));
+      const ipOk = IP_LISTS.map((l, i) => canaryIp[i] === "listed");
+      const domOk = DOMAIN_LISTS.map((l, i) => canaryDom[i] === "listed");
+      if (!ipOk.some(Boolean) && !domOk.some(Boolean) && canaryIp.every(x => x === "unknown")) return { offline: true };
+      const ipResults = await Promise.all(targets.map(t => Promise.all(IP_LISTS.map((l, i) => ipOk[i] ? query(rev(t.ip) + "." + l.zone, false) : Promise.resolve("unavailable")))));
+      const domResults = domain ? await Promise.all(DOMAIN_LISTS.map((l, i) => domOk[i] ? query(domain + "." + l.zone, true) : Promise.resolve("unavailable"))) : null;
+      return { domain, ips: targets.map((t, i) => ({ ...t, res: ipResults[i] })), domRes: domResults };
+    }
+    function render(input, data, isExample) {
+      out.replaceChildren();
+      const listings = [];
+      data.ips.forEach(t => t.res.forEach((r, i) => { if (r === "listed") listings.push({ what: t.ip, list: IP_LISTS[i] }); }));
+      (data.domRes || []).forEach((r, i) => { if (r === "listed") listings.push({ what: data.domain, list: DOMAIN_LISTS[i] }); });
+      const unavailable = [...IP_LISTS.filter((l, i) => data.ips.length && data.ips[0].res[i] === "unavailable"), ...DOMAIN_LISTS.filter((l, i) => data.domRes && data.domRes[i] === "unavailable")];
+      const checked = (data.ips.length ? IP_LISTS.length : 0) + (data.domRes ? DOMAIN_LISTS.length : 0) - unavailable.length;
+      dial.set({ value: listings.length, sub: listings.length === 1 ? "LISTING" : "LISTINGS", colour: listings.length ? "#ff8b77" : "#6fd59c", blips: listings.length });
+      const st = listings.length ? "bad" : "good";
+      out.append(verdict(st, listings.length ? "Blacklisted" : "Not listed",
+        listings.length ? `Found on ${listings.length} blacklist${listings.length === 1 ? "" : "s"}` : `${input} isn't on any blacklist we could check`,
+        listings.length ? "Some receivers will reject or junk email from the listed addresses. Find out why, fix the cause, then ask each list to remove you." : `Checked ${data.ips.length} server address${data.ips.length === 1 ? "" : "es"}${data.domRes ? " and the domain itself" : ""} against ${checked} lists.`,
+        isExample));
+      out.append(figures([[String(data.ips.length), "server addresses checked"], [String(checked), "blacklists checked"], [String(listings.length), "listings found", listings.length ? "var(--bad)" : "var(--good)"], [String(unavailable.length), "lists couldn't be checked", unavailable.length ? "var(--warn)" : ""]]));
+      const pill = (name, r) => el("span", "pill " + (r === "listed" ? "bad" : r === "clean" ? "good" : ""), `${name}: ${r === "listed" ? "Listed" : r === "clean" ? "Clean" : r === "unavailable" ? "Not available" : "No answer"}`);
+      const p = panel("Mail server addresses", data.domain ? "From the domain's MX records and any single addresses in its SPF record." : "The address you entered.");
+      if (!data.ips.length) p.append(el("p", "empty-note", "No mail server addresses were found for this domain."));
+      data.ips.forEach(t => {
+        const row = el("div", "bl-ip"); row.append(el("h4", null, t.ip), el("small", null, t.label));
+        const pills = el("div", "bl-pills"); t.res.forEach((r, i) => pills.append(pill(IP_LISTS[i].name, r))); row.append(pills); p.append(row);
+      });
+      out.append(p);
+      if (data.domRes) {
+        const pd = panel("The domain itself", "Domain blacklists flag domains seen in spam links.");
+        const row = el("div", "bl-ip"); row.append(el("h4", null, data.domain));
+        const pills = el("div", "bl-pills"); data.domRes.forEach((r, i) => pills.append(pill(DOMAIN_LISTS[i].name, r))); row.append(pills); pd.append(row); out.append(pd);
+      }
+      if (listings.length) {
+        const pl = panel("Request removal", "Fix the cause first, or you'll be listed again.");
+        const links = el("div", "links"); const done = new Set();
+        listings.forEach(x => { if (done.has(x.list.id)) return; done.add(x.list.id); links.append(extA(x.list.name + " ↗", x.list.delist)); });
+        pl.append(links); out.append(pl);
+      }
+      if (unavailable.length) out.append(panel("Lists that couldn't be checked", `${unavailable.map(l => l.name).join(", ")} ${unavailable.length === 1 ? "doesn't" : "don't"} answer lookups made through public DNS services, so ${unavailable.length === 1 ? "it was" : "they were"} skipped rather than reported as clean.`));
+      out.append(stepsPanel(listings.length ? "Getting delisted" : "Staying off blacklists", listings.length ? "In this order." : "What usually gets a business listed.", listings.length ? [
+        ["Find the cause", "usually a hacked mailbox sending spam, an infected PC, or a misconfigured server or printer."],
+        ["Fix it", "reset the account's password, turn on MFA and check for forwarding rules a hacker may have added."],
+        ["Request removal", "use the links above. Some lists remove addresses automatically after a few days."],
+        ["Check again", "run this check once you've been removed."]
+      ] : [
+        ["Protect mailboxes", "MFA on every account stops most hacked-mailbox spam."],
+        ["Set up SPF, DKIM and DMARC", "so receivers trust your genuine email."],
+        ["Watch bulk email", "send newsletters through a proper service, not your own mailbox."]
+      ]));
+      out.append(cta("Emails going to junk? Steer IT can trace the cause, clean up a compromised account and get you delisted."));
+    }
+    const SAMPLE = { input: "northbay-accounts.co.uk", data: { domain: "northbay-accounts.co.uk",
+      ips: [{ ip: "52.101.68.18", label: "Mail server northbay-accounts-co-uk.mail.protection.outlook.com", res: ["unavailable", "clean", "clean", "clean", "clean", "clean", "clean"] },
+            { ip: "203.0.113.25", label: "Sending server in SPF", res: ["unavailable", "listed", "clean", "listed", "clean", "clean", "clean"] }],
+      domRes: ["unavailable", "clean", "clean"] } };
+    let busy = false;
+    async function run(input, btn) {
+      if (busy) return; busy = true; btn.disabled = true;
+      loading(`Checking ${input} against the main blacklists…`); dial.set({ scanning: true });
+      try {
+        const data = await fetchData(input);
+        if (data.nx) { dial.set(); return errorBox("That domain doesn't exist", `No DNS records were found for ${input}. Check the spelling.`); }
+        if (data.offline) { dial.set(); return errorBox("Couldn't check the blacklists", NET_ERR); }
+        render(input, data, false);
+      } catch { dial.set(); errorBox("Couldn't check the blacklists", NET_ERR); }
+      finally { busy = false; btn.disabled = false; }
+    }
+    function mount() {
+      const f = searchForm({ id: "bl-input", label: "Domain or mail server IP address", placeholder: "yourcompany.co.uk or 203.0.113.10", button: "Check blacklists", inputmode: "url" });
+      dial = buildHero({ eyebrow: "Blacklist check", title: 'Are your emails <span class="hl">being blocked</span>?', lede: "Checks your mail servers and domain against the main spam blacklists. A single listing can send everything you email straight to junk.", form: f.form,
+        fine: [document.createTextNode("Uses public DNS lookups only. "), exLink("See an example result", () => { f.input.value = SAMPLE.input; render(SAMPLE.input, SAMPLE.data, true); })] });
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const raw = f.input.value.trim(); const h = isIp(raw) ? raw : cleanHost(raw).replace(/^www\./, "");
+        if (!isIp(h) && !validHost(h)) { errorBox("That doesn't look like a domain or IP address", "Enter a domain like yourcompany.co.uk, or an IPv4 address."); f.input.focus(); return; }
+        f.input.value = h; run(h, f.button); });
+      render(SAMPLE.input, SAMPLE.data, true);
+      foot.replaceChildren(el("div", null, "Microsoft 365 and Google Workspace send from large shared server pools, so a listing there rarely affects you on its own. The most useful result is for any server your business runs itself."));
+      const pre = takePrefill("blacklist"); if (pre) { f.input.value = pre; run(pre, f.button); }
+    }
+    return { mount };
+  })();
+
+  // ================= Tool: My domains (saved on this device) =================
+  const Watch = (() => {
+    let dial, busy = false;
+    const gradeColour = (o) => o == null ? "var(--muted)" : o >= 70 ? "var(--good)" : o >= 50 ? "var(--warn)" : "var(--bad)";
+    const ago = (iso) => {
+      if (!iso) return "Not checked yet";
+      const m = Math.round((Date.now() - new Date(iso)) / 60000);
+      return m < 1 ? "Checked just now" : m < 60 ? `Checked ${m} min ago` : m < 1440 ? `Checked ${Math.round(m / 60)} h ago` : `Checked ${Math.round(m / 1440)} day${Math.round(m / 1440) === 1 ? "" : "s"} ago`;
+    };
+    const soonestDays = (last) => { if (!last || !last.expiry) return null; const d = [last.expiry.domain, last.expiry.cert].filter(Boolean).map(x => Expiry.daysUntil(x)); return d.length ? Math.min(...d) : null; };
+    async function check(domain) {
+      const r = await Report.fetchReport(domain);
+      if (r.nx) throw new Error("nx");
+      const c = Report.compute(r);
+      if (c.overall == null) throw new Error("offline");
+      return {
+        at: new Date().toISOString(), overall: c.overall, letter: Report.letter(c.overall), sc: c.sc,
+        fails: c.fixes.filter(f => f.status === "fail").length, warns: c.fixes.filter(f => f.status === "warn").length,
+        expiry: r.exp ? { domain: r.exp.domain && r.exp.domain.expires || null, cert: r.exp.cert && r.exp.cert.expires || null } : null
+      };
+    }
+    function row(entry, isExample, refresh) {
+      const L = entry.last, w = el("div", "wrow share-line");
+      const g = el("div", "wgrade", L ? L.letter : "–"); g.style.setProperty("--gc", gradeColour(L && L.overall));
+      const mid = el("div", "wmid"); mid.append(el("div", "dn", entry.domain));
+      const meta = el("div", "meta");
+      meta.append(el("span", "pill", ago(L && L.at)));
+      if (L && entry.prev && entry.prev.letter !== L.letter) { const up = L.overall > entry.prev.overall; meta.append(el("span", "pill " + (up ? "good" : "bad"), `${up ? "Up" : "Down"} from ${entry.prev.letter}`)); }
+      if (L && L.fails) meta.append(el("span", "pill bad", `${L.fails} serious`));
+      if (L && L.warns) meta.append(el("span", "pill warn", `${L.warns} to improve`));
+      const sd = soonestDays(L); if (sd != null && sd <= 60) meta.append(el("span", "pill " + (sd <= 30 ? "bad" : "warn"), `Expiry in ${sd} days`));
+      mid.append(meta);
+      w.dataset.text = `${entry.domain}: ${L ? L.letter + " (" + L.overall + "/100)" : "not checked"}${sd != null && sd <= 60 ? ", something expires in " + sd + " days" : ""}`;
+      const acts = el("div", "acts");
+      const open = el("button", "copybtn", "Report"); open.type = "button";
+      open.addEventListener("click", () => { PREFILL = isExample ? null : { route: "report", value: entry.domain }; go("report", true); });
+      acts.append(open);
+      if (!isExample) {
+        const re = el("button", "copybtn", "Re-check"); re.type = "button";
+        re.addEventListener("click", async () => { if (busy) return; busy = true; re.textContent = "Checking…"; re.disabled = true;
+          try { Store.upsert(entry.domain, await check(entry.domain)); } catch { re.textContent = "Couldn't check"; await new Promise(r => setTimeout(r, 1500)); }
+          busy = false; refresh(); });
+        const rm = el("button", "copybtn", "Remove"); rm.type = "button"; let armed = false;
+        rm.addEventListener("click", () => { if (!armed) { armed = true; rm.textContent = "Tap again to remove"; setTimeout(() => { armed = false; rm.textContent = "Remove"; }, 3000); return; } Store.remove(entry.domain); refresh(); });
+        acts.append(re, rm);
+      }
+      w.append(g, mid, acts); return w;
+    }
+    const SAMPLE = (() => { const now = Date.now(), H = 3600000, D = 24 * H; return [
+      { domain: "northbay-accounts.co.uk", last: { at: new Date(now - 2 * H).toISOString(), overall: 54, letter: "D", fails: 1, warns: 3, expiry: { domain: new Date(now + 37 * D).toISOString(), cert: new Date(now + 60 * D).toISOString() } }, prev: { letter: "C", overall: 61 } },
+      { domain: "harbourside-dental.co.uk", last: { at: new Date(now - 26 * H).toISOString(), overall: 88, letter: "A", fails: 0, warns: 1, expiry: { domain: new Date(now + 290 * D).toISOString(), cert: new Date(now + 44 * D).toISOString() } }, prev: { letter: "B", overall: 79 } },
+      { domain: "taff-valley-joinery.com", last: { at: new Date(now - 5 * D).toISOString(), overall: 72, letter: "B", fails: 0, warns: 2, expiry: { domain: new Date(now + 21 * D).toISOString(), cert: new Date(now + 70 * D).toISOString() } }, prev: null }
+    ]; })();
+    function render() {
+      out.replaceChildren();
+      const saved = Store.load(), isExample = !saved.length, list = isExample ? SAMPLE : saved;
+      const checked = list.filter(e => e.last);
+      const worst = checked.length ? checked.reduce((a, b) => (a.last.overall <= b.last.overall ? a : b)) : null;
+      const expiring = list.filter(e => { const d = soonestDays(e.last); return d != null && d <= 30; });
+      const st = expiring.length || (worst && worst.last.overall < 50) ? "bad" : worst && worst.last.overall < 70 ? "warn" : "good";
+      dial.set({ value: list.length, sub: list.length === 1 ? "DOMAIN" : "DOMAINS", colour: "#ffffff", blips: expiring.length });
+      const v = verdict(st, isExample ? "My domains" : "Saved on this device", isExample ? "Save domains to keep an eye on them" : `${list.length} domain${list.length === 1 ? "" : "s"} saved`,
+        isExample ? "These are examples. Add a domain above and it replaces them. Your list stays on this phone only." :
+        `${worst ? `Lowest grade: ${worst.domain} (${worst.last.letter}).` : "Not checked yet."}${expiring.length ? ` ${expiring.length} with something expiring within 30 days.` : ""}`, isExample);
+      if (!isExample) {
+        const all = el("button", "sharebtn", "Re-check all"); all.type = "button";
+        all.addEventListener("click", async () => {
+          if (busy) return; busy = true; all.disabled = true;
+          const items = Store.load();
+          for (let i = 0; i < items.length; i++) {
+            all.textContent = `Checking ${i + 1} of ${items.length}…`; dial.set({ scanning: true });
+            try { Store.upsert(items[i].domain, await check(items[i].domain)); } catch {}
+          }
+          busy = false; render();
+        });
+        v.querySelector(".txt").append(all);
+      }
+      out.append(v);
+      const p = panel(isExample ? "Example list" : "Your domains", isExample ? "How it looks once you've saved a few." : "Newest first. Tap Report for the full breakdown.");
+      const box = el("div", "wlist"); list.forEach(e => box.append(row(e, isExample, render))); p.append(box);
+      out.append(p);
+      out.append(cta("Want this watched for you? Steer IT can monitor your domains and certificates and alert you before anything lapses."));
+    }
+    function mount() {
+      const f = searchForm({ id: "watch-input", label: "Domain to save", placeholder: "clientdomain.co.uk", button: "Save and check", inputmode: "url" });
+      dial = buildHero({ eyebrow: "My domains", title: 'Keep an eye on <span class="hl">every domain</span>.', lede: "Save the domains you look after, re-check them in one tap and see what's changed since last time: grades, new problems and anything about to expire.", form: f.form,
+        fine: [document.createTextNode("Your list is saved on this device only. It isn't sent anywhere.")] });
+      f.form.addEventListener("submit", async (e) => {
+        e.preventDefault(); const h = cleanHost(f.input.value).replace(/^www\./, "");
+        if (!validHost(h)) { errorBox("That doesn't look like a domain", "Enter a domain like clientdomain.co.uk."); f.input.focus(); return; }
+        if (busy) return; busy = true; f.button.disabled = true; f.input.value = h;
+        Store.upsert(h, null); loading(`Saved ${h}. Running its first check…`); dial.set({ scanning: true });
+        try { Store.upsert(h, await check(h)); } catch {}
+        busy = false; f.button.disabled = false; f.input.value = ""; render();
+      });
+      render();
+      foot.replaceChildren(el("div", null, "Each check runs the full domain report. Saved domains live in this browser's storage; clearing website data or deleting the Home Screen app removes them."));
+    }
+    return { mount, check, render: () => render() };
+  })();
+
+
+  // ================= Tool: Service status =================
+  const Status = (() => {
+    const SERVICES = [
+      { id: "m365", name: "Microsoft 365", sub: "Business: Exchange, Teams, SharePoint, Entra", type: "msft", url: "https://status.cloud.microsoft/api/posts/mac", page: "https://status.cloud.microsoft/", extra: ["Your tenant's service health", "https://admin.microsoft.com/Adminportal/Home#/servicehealth"] },
+      { id: "msconsumer", name: "Microsoft consumer", sub: "Outlook.com, OneDrive, Teams Free", type: "msftc", url: "https://status.cloud.microsoft/api/posts/m365Consumer", page: "https://status.cloud.microsoft/" },
+      { id: "teamviewer", name: "TeamViewer", sub: "Remote access and management", type: "sp", base: "https://status.teamviewer.com" },
+      { id: "cloudflare", name: "Cloudflare", sub: "DNS, CDN and security", type: "sp", base: "https://www.cloudflarestatus.com" },
+      { id: "github", name: "GitHub", sub: "Code hosting and Pages", type: "sp", base: "https://www.githubstatus.com" },
+      { id: "zoom", name: "Zoom", sub: "Meetings and phone", type: "sp", base: "https://status.zoom.us" },
+      { id: "dropbox", name: "Dropbox", sub: "File storage and sharing", type: "sp", base: "https://status.dropbox.com" },
+      { id: "xero", name: "Xero", sub: "Accounting", type: "sp", base: "https://status.xero.com" }
+    ];
+    const DEFAULT = ["m365", "teamviewer", "cloudflare"];
+    const LEVEL = { unknown: -1, ok: 0, maint: 1, minor: 2, major: 3, critical: 4 };
+    const LABEL = { unknown: "Couldn't check", ok: "Operational", maint: "Maintenance", minor: "Minor issues", major: "Major outage", critical: "Critical outage" };
+    const PILL = { unknown: "", ok: "good", maint: "", minor: "warn", major: "bad", critical: "bad" };
+    const AV = ["#0e72a0", "#21b2e6", "#2a8fb8", "#0a3550", "#4aa3c9", "#1c5f86", "#3a5bd0", "#2fa37a"];
+    const KEY = "steer-toolkit-status-v1";
+    let dial, selected = null, cache = { at: 0, results: {} }, timer = null, phaseEl = null, lastExample = true;
+    function loadSel() { if (selected) return selected; try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); if (Array.isArray(v) && v.length) selected = v.filter(id => SERVICES.some(s => s.id === id)); } catch {} if (!selected || !selected.length) selected = DEFAULT.slice(); return selected; }
+    function saveSel() { try { localStorage.setItem(KEY, JSON.stringify(selected)); } catch {} }
+    const strip = (h) => { const d = document.createElement("div"); d.innerHTML = String(h || ""); return (d.textContent || "").replace(/\s+/g, " ").trim(); };
+    async function j(url) {
+      const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 12000);
+      try { const r = await fetch(url, { signal: ctrl.signal, cache: "no-store" }); return r.ok ? await r.json() : null; } catch { return null; } finally { clearTimeout(t); }
+    }
+    function msLevel(s) {
+      s = String(s || "");
+      if (!s || /available|operational|normal|restor|resolv|false ?positive/i.test(s)) return "ok";
+      if (/interrupt|outage|down/i.test(s)) return "major";
+      return "minor";
+    }
+    // Microsoft's status feed refuses requests from other websites, so a GitHub Action in the
+    // Steer-Toolkit repository copies it every 5 minutes to a file the app can read.
+    const RELAY = "https://raw.githubusercontent.com/Steer-IT/Steer-Toolkit/status-data/microsoft.json";
+    let relayP = null, relayAt = 0;
+    function relay() {
+      if (!relayP || Date.now() - relayAt > 60000) { relayAt = Date.now(); relayP = j(RELAY + "?t=" + Math.floor(Date.now() / 60000)); }
+      return relayP;
+    }
+    async function msData(svc) {
+      const r = await relay();
+      if (r && r.fetchedAt && Date.now() - new Date(r.fetchedAt) < 45 * 60000) {
+        const d = svc.type === "msft" ? r.mac : r.consumer;
+        if (d) return { data: d, via: r.fetchedAt };
+      }
+      const direct = await j(svc.url);
+      return direct ? { data: direct, via: null } : null;
+    }
+    async function fetchOne(svc) {
+      if (svc.type === "sp") {
+        const [st, inc, mnt] = await Promise.all([j(svc.base + "/api/v2/status.json"), j(svc.base + "/api/v2/incidents/unresolved.json"), j(svc.base + "/api/v2/scheduled-maintenances/active.json")]);
+        if (!st || !st.status) return { level: "unknown" };
+        const map = { none: "ok", minor: "minor", major: "major", critical: "critical", maintenance: "maint" };
+        let level = map[st.status.indicator] || "minor";
+        const incidents = ((inc && inc.incidents) || []).map(i => {
+          const lv = map[i.impact] || "minor"; if (LEVEL[lv] > LEVEL[level]) level = lv;
+          const u = (i.incident_updates || [])[0];
+          return { name: i.name, level: lv, status: i.status, at: i.updated_at || i.created_at, text: u ? strip(u.body) : "", link: i.shortlink || (svc.base + "/incidents/" + i.id) };
+        });
+        const maint = ((mnt && mnt.scheduled_maintenances) || []).map(m => ({ name: m.name, level: "maint", status: "maintenance", at: m.scheduled_for, text: strip(((m.incident_updates || [])[0] || {}).body), link: m.shortlink }));
+        if (maint.length && level === "ok") level = "maint";
+        return { level, desc: st.status.description, incidents: incidents.concat(maint) };
+      }
+      const got = await msData(svc);
+      if (!got) return { level: "unknown" };
+      const data = got.data, fresh = got.via ? ` · updated ${ago(got.via)}` : "";
+      if (svc.type === "msft") {
+        const level = msLevel(data.Status);
+        return { level, desc: (level === "ok" ? "No widespread incidents reported" : String(data.Status)) + fresh, incidents: level === "ok" ? [] : [{ name: strip(data.Title) || "Microsoft 365 incident", level, status: String(data.Status), at: data.LastUpdatedTime, text: strip(data.Message), link: svc.page }] };
+      }
+      const list = Array.isArray(data) ? data : [];
+      const affected = list.filter(x => msLevel(x.Status) !== "ok");
+      const level = affected.reduce((a, x) => LEVEL[msLevel(x.Status)] > LEVEL[a] ? msLevel(x.Status) : a, "ok");
+      return { level, desc: (affected.length ? `${affected.length} service${affected.length === 1 ? "" : "s"} affected` : "All services operational") + fresh,
+        incidents: affected.map(x => ({ name: x.ServiceDisplayName, level: msLevel(x.Status), status: String(x.Status), at: x.LastUpdatedTime, text: strip(x.Title || x.Message), link: svc.page })) };
+    }
+    async function check(force) {
+      const ids = loadSel(), now = Date.now();
+      const need = ids.filter(id => force || !cache.results[id] || now - cache.results[id].fetched > 90000);
+      const got = await Promise.all(need.map(id => fetchOne(SERVICES.find(s => s.id === id)).catch(() => ({ level: "unknown" }))));
+      need.forEach((id, i) => { cache.results[id] = { ...got[i], fetched: Date.now() }; });
+      cache.at = Date.now();
+      return ids.map(id => ({ svc: SERVICES.find(s => s.id === id), res: cache.results[id] }));
+    }
+    const worstOf = (rows) => rows.reduce((a, r) => Math.max(a, LEVEL[r.res.level]), -1);
+    const hhmm = (t) => new Date(t).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    const ago = (iso) => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+
+    function card(row) {
+      const { svc, res } = row, lv = res.level;
+      const c = el("div", "svc share-line lv-" + lv); c.dataset.text = `${svc.name}: ${LABEL[lv]}${res.incidents && res.incidents.length ? " (" + res.incidents.map(i => i.name).join("; ") + ")" : ""}`;
+      const head = el("div", "svc-h");
+      const av = el("div", "avatar", svc.name.replace(/[^A-Za-z0-9 ]/g, "").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase());
+      av.style.background = AV[SERVICES.indexOf(svc) % AV.length]; av.setAttribute("aria-hidden", "true");
+      const nm = el("div", "svc-n"); nm.append(el("b", null, svc.name), el("span", null, svc.sub));
+      head.append(av, nm, el("span", "pill " + PILL[lv], LABEL[lv]));
+      c.append(head);
+      if (lv === "unknown") c.append(el("p", "svc-d", "The status page didn't respond. Open it directly to check."));
+      else if (!res.incidents || !res.incidents.length) c.append(el("p", "svc-d", res.desc || "No known issues."));
+      else {
+        const ul = el("ul", "incs");
+        res.incidents.slice(0, 4).forEach(i => {
+          const li = el("li"); const top = el("div", "inc-top");
+          top.append(el("b", null, i.name)); const stx = i.status ? i.status.replace(/_/g, " ") : ""; const meta = el("span", "inc-meta", [stx ? stx[0].toUpperCase() + stx.slice(1) : "", ago(i.at)].filter(Boolean).join(" · ")); top.append(meta);
+          li.append(top); if (i.text) li.append(el("p", null, i.text.length > 240 ? i.text.slice(0, 237) + "…" : i.text));
+          if (i.link) li.append(extA("Details ↗", i.link)); ul.append(li);
+        });
+        c.append(ul);
+      }
+      const links = el("div", "svc-links"); links.append(extA("Official status page ↗", svc.page || svc.base));
+      if (svc.extra) links.append(extA(svc.extra[0] + " ↗", svc.extra[1]));
+      c.append(links);
+      return c;
+    }
+    function render(rows, isExample, when) {
+      out.replaceChildren(); lastExample = isExample;
+      const sorted = rows.slice().sort((a, b) => LEVEL[b.res.level] - LEVEL[a.res.level]);
+      const worst = worstOf(rows), bad = rows.filter(r => LEVEL[r.res.level] >= 3), minor = rows.filter(r => r.res.level === "minor"), maint = rows.filter(r => r.res.level === "maint"), unk = rows.filter(r => r.res.level === "unknown");
+      const issues = rows.filter(r => LEVEL[r.res.level] >= 2).length;
+      dial.set({ value: issues, sub: issues === 1 ? "ISSUE" : "ISSUES", colour: worst >= 3 ? "#ff8b77" : worst === 2 ? "#f3b75c" : "#6fd59c", blips: issues });
+      const names = (list) => list.map(r => r.svc.name).join(", ");
+      const st = worst >= 3 ? "bad" : worst === 2 ? "warn" : "good";
+      const title = bad.length ? `Major outage: ${names(bad)}` : minor.length ? `Minor issues: ${names(minor)}` : maint.length ? `Maintenance in progress: ${names(maint)}` : unk.length === rows.length ? "Couldn't reach the status pages" : `All ${rows.length - unk.length} services are running normally`;
+      const body = (isExample ? "These are example statuses. " : `Checked at ${hhmm(when)}. Refreshes every 2 minutes while this page is open. `) + (unk.length && unk.length < rows.length ? `${names(unk)} couldn't be checked.` : "");
+      out.append(verdict(unk.length === rows.length && !isExample ? "err" : st, bad.length ? "Outage" : minor.length ? "Degraded" : maint.length ? "Maintenance" : "All clear", title, body, isExample));
+      const grid = el("div", "svcs"); sorted.forEach(r => grid.append(card(r))); out.append(grid);
+      const pf = panel("Choose services", "Tap to show or hide a service. Your choice is remembered on this device.");
+      const chips = el("div", "filters");
+      SERVICES.forEach(s => {
+        const b = el("button", "chipbtn", s.name); b.type = "button"; b.setAttribute("aria-pressed", String(loadSel().includes(s.id)));
+        b.addEventListener("click", () => {
+          const on = selected.includes(s.id);
+          if (on && selected.length === 1) return;
+          selected = on ? selected.filter(x => x !== s.id) : SERVICES.map(x => x.id).filter(id => id === s.id || selected.includes(id));
+          saveSel(); b.setAttribute("aria-pressed", String(!on)); refresh(false);
+        });
+        chips.append(b);
+      });
+      pf.append(chips); out.append(pf);
+      out.append(cta("Outage affecting your business? Steer IT monitors the services our clients rely on and keeps you updated while it's fixed."));
+    }
+    function sampleRows() {
+      const now = Date.now(), m = 60000;
+      const S = {
+        m365: { level: "major", desc: "Service interruption", incidents: [{ name: "Some users can't access Exchange Online mailboxes", level: "major", status: "Service interruption", at: new Date(now - 34 * m).toISOString(), text: "We're investigating reports that users in Europe can't connect to their mailboxes using Outlook and Outlook on the web.", link: "https://status.cloud.microsoft/" }] },
+        msconsumer: { level: "ok", desc: "All services operational", incidents: [] },
+        teamviewer: { level: "ok", desc: "All Systems Operational", incidents: [] },
+        cloudflare: { level: "minor", desc: "Minor Service Outage", incidents: [{ name: "Elevated errors in the Cloudflare dashboard", level: "minor", status: "monitoring", at: new Date(now - 12 * m).toISOString(), text: "A fix has been implemented and we are monitoring the results.", link: "https://www.cloudflarestatus.com/" }] },
+        github: { level: "ok", desc: "All Systems Operational", incidents: [] }, zoom: { level: "ok", desc: "All Systems Operational", incidents: [] },
+        dropbox: { level: "ok", desc: "All Systems Operational", incidents: [] }, xero: { level: "maint", desc: "Service Under Maintenance", incidents: [{ name: "Scheduled maintenance: bank feeds", level: "maint", status: "in progress", at: new Date(now - 20 * m).toISOString(), text: "Bank feeds may be delayed during this window.", link: "https://status.xero.com/" }] }
+      };
+      return loadSel().map(id => ({ svc: SERVICES.find(s => s.id === id), res: S[id] }));
+    }
+    function setPhase(t) { if (phaseEl) phaseEl.textContent = t; }
+    let busy = false;
+    async function refresh(force) {
+      if (busy) return; busy = true; setPhase("Checking…"); dial.set({ scanning: true });
+      try {
+        const rows = await check(force);
+        if (current !== "status") return;
+        if (rows.every(r => r.res.level === "unknown")) { render(sampleRows(), true); setPhase("Live status couldn't be loaded here, so examples are shown."); }
+        else { render(rows, false, cache.at); setPhase(`Last checked ${hhmm(cache.at)}`); }
+        updateAlerts(rows);
+      } finally { busy = false; }
+    }
+    // Red dot on the Status tab and a banner on the dashboard when something is down
+    function updateAlerts(rows) {
+      const worst = rows.some(r => r.res.level !== "unknown") ? worstOf(rows) : -1;
+      document.querySelectorAll('a[data-route="status"]').forEach(a => { a.classList.toggle("alert-major", worst >= 3); a.classList.toggle("alert-minor", worst === 2); });
+      return worst;
+    }
+    function mount() {
+      loadSel();
+      const row = el("div", "start-row");
+      const btn = el("button", "primary", "Refresh now"); btn.type = "button"; btn.addEventListener("click", () => refresh(true));
+      phaseEl = el("span", "phase", "Checking…"); row.append(btn, phaseEl);
+      dial = buildHero({ eyebrow: "Service status", title: 'Is it <span class="hl">them</span>, or is it us?', lede: "Live status for the cloud services your business depends on. Choose the ones you want to watch. A major outage turns red here, on the dashboard and on the Status tab.", form: row,
+        fine: [document.createTextNode("Read from each provider's official status page.")] });
+      const cached = SERVICES.length && loadSel().every(id => cache.results[id]) ? loadSel().map(id => ({ svc: SERVICES.find(s => s.id === id), res: cache.results[id] })) : null;
+      if (cached && cached.some(r => r.res.level !== "unknown")) { render(cached, false, cache.at); setPhase(`Last checked ${hhmm(cache.at)}`); } else render(sampleRows(), true);
+      refresh(false);
+      clearInterval(timer);
+      timer = setInterval(() => { if (current !== "status") { clearInterval(timer); return; } if (document.visibilityState === "visible") refresh(true); }, 120000);
+      foot.replaceChildren(el("div", null, "Microsoft's public status page only lists widespread incidents. For problems affecting just your organisation, check Service health in the Microsoft 365 admin centre."));
+    }
+    // For the dashboard banner: background check of the saved selection
+    async function background() {
+      const rows = await check(false);
+      const worst = updateAlerts(rows);
+      return { worst, down: rows.filter(r => LEVEL[r.res.level] >= 3).map(r => r.svc.name), degraded: rows.filter(r => r.res.level === "minor").map(r => r.svc.name) };
+    }
+    return { mount, background };
+  })();
+
 
   // ================= Dashboard =================
   const Home = (() => {
@@ -1398,39 +2627,76 @@ footer a { color: inherit; }
       password: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="21" width="30" height="21" rx="4"/><path d="M15 21v-6a9 9 0 0118 0v6"/><circle cx="17" cy="31.5" r="1.6" fill="#21b2e6"/><circle cx="24" cy="31.5" r="1.6" fill="#21b2e6"/><circle cx="31" cy="31.5" r="1.6" fill="#21b2e6"/></svg>',
       website: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="38" height="30" rx="4"/><path d="M5 17h38"/><circle cx="10" cy="13" r=".8" fill="#21b2e6"/><circle cx="14" cy="13" r=".8" fill="#21b2e6"/><path d="M17 29l5 5 10-11" stroke="#6fd59c"/></svg>',
       speed: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 34a17 17 0 1134 0"/><path d="M24 34l9-11" stroke="#6fd59c"/><circle cx="24" cy="34" r="2.6" fill="#21b2e6"/><path d="M12 34h-2M38 34h-2M24 17v2M14 22l1.5 1.5M34 22l-1.5 1.5"/></svg>',
-      dns: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c5 5 7 11 7 17s-2 12-7 17c-5-5-7-11-7-17s2-12 7-17z"/><rect x="29" y="30" width="14" height="10" rx="2" fill="#0a3550"/><path d="M32 33.5h8M32 36.5h5"/></svg>'
+      dns: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c5 5 7 11 7 17s-2 12-7 17c-5-5-7-11-7-17s2-12 7-17z"/><rect x="29" y="30" width="14" height="10" rx="2" fill="#0a3550"/><path d="M32 33.5h8M32 36.5h5"/></svg>',
+      report: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="5" width="30" height="38" rx="4"/><path d="M16 15h16M16 22h10"/><circle cx="31" cy="32" r="7" fill="#0a3550" stroke="#6fd59c"/><path d="M28 32l2 2 4-4" stroke="#6fd59c"/></svg>',
+      expiry: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="9" width="36" height="32" rx="4"/><path d="M6 18h36M15 5v8M33 5v8"/><circle cx="31" cy="31" r="7" fill="#0a3550" stroke="#f3b75c"/><path d="M31 28v3.5l2 1.5" stroke="#f3b75c"/></svg>',
+      builder: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="36" height="32" rx="4"/><path d="M13 17l5 5-5 5M22 29h12"/></svg>',
+      blacklist: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="30" height="22" rx="3"/><path d="M6 13l14 10 14-10"/><circle cx="35" cy="33" r="9" fill="#0a3550" stroke="#ff8b77"/><path d="M29 39l12-12" stroke="#ff8b77"/></svg>',
+      watch: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 6h22a2 2 0 012 2v34l-13-8-13 8V8a2 2 0 012-2z"/><path d="M18 18l4 4 8-8" stroke="#6fd59c"/></svg>',
+      status: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="38" height="30" rx="4"/><path d="M10 25h7l3-7 6 14 3-7h9"/><circle cx="39" cy="12" r="5" fill="#ff8b77" stroke="#0a3550"/></svg>'
     };
     const TOOLS = [
+      { id: "report", q: "How does my domain score overall?", title: "Full domain report", text: "Type a domain once to run the email, website, renewal and DNS checks together. You get one grade, a score for each area and the most important fixes first.", tags: ["Overall grade", "Top fixes", "Share"], wide: true },
+      { id: "builder", q: "What should my records say?", title: "Record builder", text: "Builds SPF, DMARC, MTA-STS and CAA records from a few simple choices, starting from what the domain has now. Copy and paste into your DNS host.", tags: ["SPF", "DMARC", "MTA-STS", "CAA"] },
+      { id: "blacklist", q: "Why are my emails going to junk?", title: "Blacklist check", text: "Checks a domain's mail servers and the domain itself against the main spam blacklists, with removal links if anything is listed.", tags: ["10 blacklists", "Mail servers", "Delisting"] },
+      { id: "status", q: "Is it them, or is it us?", title: "Service status", text: "Live status for Microsoft 365, TeamViewer, Cloudflare and other services you choose. Anything with a major outage turns red, here and on the Status tab.", tags: ["Microsoft 365", "TeamViewer", "Cloudflare", "Pick your own"], wide: true },
+      { id: "watch", q: "What's changed since last time?", title: "My domains", text: "Save the domains you look after on this device, re-check them in one tap and see grade changes and anything about to expire.", tags: ["Saved list", "Re-check all", "Changes"] },
       { id: "breach", q: "Has my email been leaked?", title: "Breach check", text: "Find out if an email address appears in known data breaches or leaked dumps, what was exposed and when.", tags: ["Breaches", "Paste dumps", "Risk score"] },
       { id: "domain", q: "Can someone send email as me?", title: "Email security check", text: "Tests your domain's SPF, DKIM, DMARC and MTA-STS setup to see whether criminals could impersonate you by email.", tags: ["SPF", "DKIM", "DMARC", "MTA-STS"] },
-      { id: "password", q: "Is my password safe?", title: "Password check", text: "Rates how fast a password could be cracked and checks it against a billion leaked passwords, privately.", tags: ["Strength", "Crack time", "Leaked lists"] },
+      { id: "password", q: "Is my password safe?", title: "Password check", text: "Rates how fast a password could be cracked, checks it against a billion leaked passwords privately, and generates strong new ones.", tags: ["Strength", "Leaked lists", "Generator"] },
       { id: "website", q: "Is my website secure?", title: "Website scan", text: "Grades your website's browser security protections and checks certificate and DNS hardening.", tags: ["Headers grade", "CAA", "DNSSEC"] },
       { id: "dns", q: "Who runs my domain?", title: "DNS lookup", text: "Pulls every public DNS record for a domain, finds its subdomains and shows who hosts the email, website and DNS. Export it all as a zone file.", tags: ["All record types", "Subdomains", "Zone export"] },
-      { id: "speed", q: "Is my internet up to the job?", title: "Speed test", text: "Measures download and upload speed, ping, jitter and responsiveness under load, then shows what your connection can handle: video calls, cloud backups and how many people at once.", tags: ["Download", "Upload", "Ping & jitter", "Bufferbloat"] }
+      { id: "expiry", q: "When does my domain run out?", title: "Expiry check", text: "Shows when the domain and website certificate expire, who the registrar is and whether the domain is protected against theft.", tags: ["Domain renewal", "Certificate", "Registrar"] },
+      { id: "speed", q: "Is my internet up to the job?", title: "Speed test", text: "Measures download and upload speed, ping, jitter and responsiveness under load, then shows what your connection can handle: video calls, cloud backups and how many people at once.", tags: ["Download", "Upload", "Ping & jitter", "My IP address"] }
     ];
     function mount() {
       const ctas = el("div", "hero-cta");
-      const a1 = el("a", "solid", "Start with a breach check"); a1.href = "#breach"; a1.dataset.route = "breach";
-      const a2 = el("a", "ghost", "Test your email domain"); a2.href = "#domain"; a2.dataset.route = "domain";
+      const a1 = el("a", "solid", "Run a full domain report"); a1.href = "#report"; a1.dataset.route = "report";
+      const a2 = el("a", "ghost", "Check an email for breaches"); a2.href = "#breach"; a2.dataset.route = "breach";
       ctas.append(a1, a2);
-      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Six free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Each one explains what it found in plain English and what to do about it.", ctas });
-      dial.set({ value: "6", sub: "FREE TOOLS" });
+      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Twelve free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Pick a section below to see its tools.", ctas });
+      dial.set({ value: "12", sub: "FREE TOOLS" });
       out.replaceChildren();
-      const grid = el("div", "tool-grid");
-      TOOLS.forEach(t => {
-        const a = el("a", "tool-card" + (t.wide ? " wide" : "")); a.href = "#" + t.id; a.dataset.route = t.id;
-        const art = el("div", "art"); art.innerHTML = ART[t.id]; art.setAttribute("aria-hidden", "true");
-        const c = el("div", "copy");
-        c.append(el("span", "q", t.q), el("h3", null, t.title), el("p", null, t.text));
-        const chk = el("div", "chk"); t.tags.forEach(x => chk.append(el("span", "pill", x))); c.append(chk, el("span", "go", "Open tool →"));
-        a.append(art, c); grid.append(a);
+      const banner = el("div"); out.append(banner);
+      Status.background().then(r => {
+        if (current !== "home" || r.worst < 2) return;
+        const a = el("a", "alert-banner" + (r.worst >= 3 ? "" : " minor")); a.href = "#status"; a.dataset.route = "status";
+        const t = el("div"); t.append(el("b", null, r.worst >= 3 ? "Major outage" : "Service issues"), el("span", null, (r.worst >= 3 ? r.down : r.degraded).join(", ")));
+        a.append(t, el("em", null, "See service status →")); banner.replaceWith(a);
+      }).catch(() => {});
+      const SECTIONS = [
+        { id: "domain", title: "Domain and email", blurb: "Grades, email security, DNS records, blacklists and renewals", tools: ["report", "watch", "domain", "builder", "blacklist", "website", "dns", "expiry"], art: "report" },
+        { id: "security", title: "Security", blurb: "Leaked accounts, password strength and a password generator", tools: ["breach", "password"], art: "password" },
+        { id: "network", title: "Services and network", blurb: "Live outages for the services you use, and internet speed", tools: ["status", "speed"], art: "status" }
+      ];
+      let open = null; try { open = localStorage.getItem("steer-toolkit-section"); } catch {}
+      const wrap = el("div", "sections");
+      SECTIONS.forEach(sec => {
+        const box = el("div", "section" + (open === sec.id ? " open" : ""));
+        const btn = el("button", "sec-btn"); btn.type = "button"; btn.id = "sec-" + sec.id;
+        btn.setAttribute("aria-expanded", String(open === sec.id)); btn.setAttribute("aria-controls", "sec-list-" + sec.id);
+        const art = el("div", "art"); art.innerHTML = ART[sec.art]; art.setAttribute("aria-hidden", "true");
+        const txt = el("div", "sec-txt"); txt.append(el("b", null, sec.title), el("span", null, sec.blurb));
+        const count = el("span", "sec-count", `${sec.tools.length} tools`);
+        const chev = el("span", "chev"); chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+        btn.append(art, txt, count, chev);
+        const list = el("div", "sec-list"); list.id = "sec-list-" + sec.id; list.hidden = open !== sec.id;
+        sec.tools.forEach(id => {
+          const t = TOOLS.find(x => x.id === id); if (!t) return;
+          const a = el("a", "tool-row"); a.href = "#" + t.id; a.dataset.route = t.id;
+          const ic = el("div", "art sm"); ic.innerHTML = ART[t.id]; ic.setAttribute("aria-hidden", "true");
+          const c = el("div", "tr-txt"); c.append(el("b", null, t.title), el("span", null, t.q));
+          a.append(ic, c, el("span", "tr-go", "›")); list.append(a);
+        });
+        btn.addEventListener("click", () => {
+          const willOpen = list.hidden;
+          wrap.querySelectorAll(".section").forEach(x => { x.classList.remove("open"); x.querySelector(".sec-btn").setAttribute("aria-expanded", "false"); x.querySelector(".sec-list").hidden = true; });
+          if (willOpen) { box.classList.add("open"); btn.setAttribute("aria-expanded", "true"); list.hidden = false; }
+          try { localStorage.setItem("steer-toolkit-section", willOpen ? sec.id : ""); } catch {}
+        });
+        box.append(btn, list); wrap.append(box);
       });
-      out.append(grid);
-      const why = panel("Why these checks", "They cover the routes into most small-business incidents.");
-      const w = el("div", "why");
-      [["Email", "is the way in for most attacks on small businesses, through phishing and impersonation."], ["Passwords", "reused from old breaches are the first thing attackers try against Microsoft 365 logins."], ["Websites", "with missing protections can be used to steal visitors' sessions or details."]]
-        .forEach(([b, s]) => { const d = el("div"); d.append(el("b", null, b), el("span", null, s)); w.append(d); });
-      why.append(w); out.append(why);
+      out.append(wrap);
       out.append(cta("Want this done properly across your whole business? Steer IT runs full security reviews, Cyber Essentials certification and ongoing monitoring."));
       foot.replaceChildren(el("div", null, "These tools use public data sources and passive checks only. Results are a starting point, not a full security assessment."));
     }
@@ -1438,16 +2704,14 @@ footer a { color: inherit; }
   })();
 
   // ================= Router =================
-  const ROUTES = { home: Home, breach: Breach, domain: Domain, password: Password, website: Website, dns: Dns, speed: Speed };
-  let current = null;
+  const ROUTES = { home: Home, report: Report, breach: Breach, domain: Domain, password: Password, website: Website, dns: Dns, expiry: Expiry, speed: Speed, builder: Builder, blacklist: Blacklist, watch: Watch, status: Status };
   function go(route, push) {
     if (!ROUTES[route]) route = "home";
     if (route === current) return;
     current = route;
     document.querySelectorAll("nav.tools a, nav.tabbar a").forEach(a => { if (a.dataset.route === route) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     ROUTES[route].mount();
-    const titles = { home: "Security Toolkit", breach: "Breach check", domain: "Email security check", password: "Password check", website: "Website scan", dns: "DNS lookup", speed: "Speed test" };
-    try { document.title = (route === "home" ? "Steer IT Security Toolkit" : titles[route] + " · Steer IT"); } catch {}
+    try { document.title = (route === "home" ? "Steer IT Security Toolkit" : TITLES[route] + " · Steer IT"); } catch {}
     if (push) { try { if (location.hash !== "#" + route) history.pushState(null, "", "#" + route); } catch {} }
     window.scrollTo({ top: 0 });
   }
