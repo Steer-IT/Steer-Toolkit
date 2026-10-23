@@ -1,0 +1,51 @@
+# Copies Microsoft's public service status to the status-data branch every 5 minutes.
+# The toolkit can't read status.cloud.microsoft directly (it refuses requests from other
+# websites), but it can read files from this repository.
+name: Microsoft status relay
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: status-relay
+  cancel-in-progress: true
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Fetch Microsoft status
+        run: |
+          mkdir -p out
+          fetch() {
+            if curl -sS --fail --max-time 20 -H "Accept: application/json" "$1" -o "$2" && jq empty "$2" 2>/dev/null; then
+              echo "Fetched $1"
+            else
+              echo "Couldn't fetch $1"; echo 'null' > "$2"
+            fi
+          }
+          fetch https://status.cloud.microsoft/api/posts/mac mac.json
+          fetch https://status.cloud.microsoft/api/posts/m365Consumer consumer.json
+          jq -n --slurpfile mac mac.json --slurpfile consumer consumer.json \
+            --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{fetchedAt: $at, mac: $mac[0], consumer: $consumer[0]}' > out/microsoft.json
+          head -c 600 out/microsoft.json
+
+      - name: Publish to the status-data branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd out
+          git init -q -b status-data
+          git config user.name "status-relay"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add microsoft.json
+          git commit -q -m "Microsoft status $(date -u +%H:%M)"
+          # Force-push a single commit so the branch never builds up history
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" status-data

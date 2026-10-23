@@ -439,6 +439,33 @@ nav.tabbar a.alert-minor::after { background: var(--warn); }
 nav.tools a.alert-major::after, nav.tools a.alert-minor::after { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #d23a26; margin-left: 6px; vertical-align: 2px; }
 nav.tools a.alert-minor::after { background: #b26a00; }
 
+/* Dashboard sections */
+.sections { display: flex; flex-direction: column; gap: 12px; max-width: 760px; width: 100%; margin: 0 auto; }
+.section { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: border-color .2s; }
+.section.open { border-color: var(--steer-cyan); }
+.sec-btn { width: 100%; font: inherit; color: inherit; background: none; border: 0; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto 24px; gap: 14px; align-items: center; padding: 16px; text-align: left; }
+.sec-btn .art { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(140deg, var(--hero-2), var(--hero)); display: grid; place-items: center; }
+.sec-btn .art svg { width: 34px; height: 34px; }
+.sec-txt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sec-txt b { font-family: var(--font-display); font-size: 20px; line-height: 1.2; }
+.sec-txt span { font-size: 13.5px; color: var(--muted); }
+.sec-count { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.chev { width: 24px; height: 24px; color: var(--accent); transition: transform .2s; }
+.chev svg { width: 24px; height: 24px; }
+.section.open .chev { transform: rotate(180deg); }
+.sec-list { border-top: 1px solid var(--line); }
+.tool-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) 16px; gap: 12px; align-items: center; padding: 12px 16px; text-decoration: none; color: inherit; border-top: 1px solid var(--line); }
+.tool-row:first-child { border-top: 0; }
+.tool-row:hover { background: var(--bg); }
+.tool-row .art.sm { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(140deg, var(--hero-2), var(--hero)); display: grid; place-items: center; }
+.tool-row .art.sm svg { width: 25px; height: 25px; }
+.tr-txt { min-width: 0; display: flex; flex-direction: column; }
+.tr-txt b { font-weight: 600; font-size: 15.5px; }
+.tr-txt span { font-size: 13px; color: var(--muted); }
+.tr-go { font-size: 24px; line-height: 1; color: var(--muted); }
+@media (max-width: 460px) { .sec-btn { grid-template-columns: 48px minmax(0, 1fr) 24px; gap: 12px; padding: 14px; } .sec-btn .art { width: 48px; height: 48px; } .sec-count { display: none; } .sec-txt b { font-size: 18px; } }
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+
 footer .inner { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-block: 18px 40px; display: flex; flex-direction: column; gap: 6px; }
 footer a { color: inherit; }
 @media (prefers-reduced-motion: reduce) { .dial .sweep, .spinner { animation-duration: 6s; } .bar-row .t i, .tool-card { transition: none; } }
@@ -2429,6 +2456,23 @@ footer a { color: inherit; }
       if (/interrupt|outage|down/i.test(s)) return "major";
       return "minor";
     }
+    // Microsoft's status feed refuses requests from other websites, so a GitHub Action in the
+    // Steer-Toolkit repository copies it every 5 minutes to a file the app can read.
+    const RELAY = "https://raw.githubusercontent.com/Steer-IT/Steer-Toolkit/status-data/microsoft.json";
+    let relayP = null, relayAt = 0;
+    function relay() {
+      if (!relayP || Date.now() - relayAt > 60000) { relayAt = Date.now(); relayP = j(RELAY + "?t=" + Math.floor(Date.now() / 60000)); }
+      return relayP;
+    }
+    async function msData(svc) {
+      const r = await relay();
+      if (r && r.fetchedAt && Date.now() - new Date(r.fetchedAt) < 45 * 60000) {
+        const d = svc.type === "msft" ? r.mac : r.consumer;
+        if (d) return { data: d, via: r.fetchedAt };
+      }
+      const direct = await j(svc.url);
+      return direct ? { data: direct, via: null } : null;
+    }
     async function fetchOne(svc) {
       if (svc.type === "sp") {
         const [st, inc, mnt] = await Promise.all([j(svc.base + "/api/v2/status.json"), j(svc.base + "/api/v2/incidents/unresolved.json"), j(svc.base + "/api/v2/scheduled-maintenances/active.json")]);
@@ -2444,16 +2488,17 @@ footer a { color: inherit; }
         if (maint.length && level === "ok") level = "maint";
         return { level, desc: st.status.description, incidents: incidents.concat(maint) };
       }
-      const data = await j(svc.url);
-      if (!data) return { level: "unknown" };
+      const got = await msData(svc);
+      if (!got) return { level: "unknown" };
+      const data = got.data, fresh = got.via ? ` · updated ${ago(got.via)}` : "";
       if (svc.type === "msft") {
         const level = msLevel(data.Status);
-        return { level, desc: level === "ok" ? "No widespread incidents reported" : String(data.Status), incidents: level === "ok" ? [] : [{ name: strip(data.Title) || "Microsoft 365 incident", level, status: String(data.Status), at: data.LastUpdatedTime, text: strip(data.Message), link: svc.page }] };
+        return { level, desc: (level === "ok" ? "No widespread incidents reported" : String(data.Status)) + fresh, incidents: level === "ok" ? [] : [{ name: strip(data.Title) || "Microsoft 365 incident", level, status: String(data.Status), at: data.LastUpdatedTime, text: strip(data.Message), link: svc.page }] };
       }
       const list = Array.isArray(data) ? data : [];
       const affected = list.filter(x => msLevel(x.Status) !== "ok");
       const level = affected.reduce((a, x) => LEVEL[msLevel(x.Status)] > LEVEL[a] ? msLevel(x.Status) : a, "ok");
-      return { level, desc: affected.length ? `${affected.length} service${affected.length === 1 ? "" : "s"} affected` : "All services operational",
+      return { level, desc: (affected.length ? `${affected.length} service${affected.length === 1 ? "" : "s"} affected` : "All services operational") + fresh,
         incidents: affected.map(x => ({ name: x.ServiceDisplayName, level: msLevel(x.Status), status: String(x.Status), at: x.LastUpdatedTime, text: strip(x.Title || x.Message), link: svc.page })) };
     }
     async function check(force) {
@@ -2610,7 +2655,7 @@ footer a { color: inherit; }
       const a1 = el("a", "solid", "Run a full domain report"); a1.href = "#report"; a1.dataset.route = "report";
       const a2 = el("a", "ghost", "Check an email for breaches"); a2.href = "#breach"; a2.dataset.route = "breach";
       ctas.append(a1, a2);
-      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Twelve free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Each one explains what it found in plain English and what to do about it.", ctas });
+      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Twelve free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Pick a section below to see its tools.", ctas });
       dial.set({ value: "12", sub: "FREE TOOLS" });
       out.replaceChildren();
       const banner = el("div"); out.append(banner);
@@ -2620,25 +2665,39 @@ footer a { color: inherit; }
         const t = el("div"); t.append(el("b", null, r.worst >= 3 ? "Major outage" : "Service issues"), el("span", null, (r.worst >= 3 ? r.down : r.degraded).join(", ")));
         a.append(t, el("em", null, "See service status →")); banner.replaceWith(a);
       }).catch(() => {});
-      const GROUPS = [["Check a domain", ["report", "domain", "builder", "blacklist", "website", "dns", "expiry"]], ["People and passwords", ["breach", "password"]], ["Status, saved domains and connection", ["status", "watch", "speed"]]];
-      GROUPS.forEach(([heading, ids]) => {
-      out.append(el("h2", "group-h", heading));
-      const grid = el("div", "tool-grid");
-      TOOLS.filter(t => ids.includes(t.id)).sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id)).forEach(t => {
-        const a = el("a", "tool-card" + (t.wide ? " wide" : "")); a.href = "#" + t.id; a.dataset.route = t.id;
-        const art = el("div", "art"); art.innerHTML = ART[t.id]; art.setAttribute("aria-hidden", "true");
-        const c = el("div", "copy");
-        c.append(el("span", "q", t.q), el("h3", null, t.title), el("p", null, t.text));
-        const chk = el("div", "chk"); t.tags.forEach(x => chk.append(el("span", "pill", x))); c.append(chk, el("span", "go", "Open tool →"));
-        a.append(art, c); grid.append(a);
+      const SECTIONS = [
+        { id: "domain", title: "Domain and email", blurb: "Grades, email security, DNS records, blacklists and renewals", tools: ["report", "watch", "domain", "builder", "blacklist", "website", "dns", "expiry"], art: "report" },
+        { id: "security", title: "Security", blurb: "Leaked accounts, password strength and a password generator", tools: ["breach", "password"], art: "password" },
+        { id: "network", title: "Services and network", blurb: "Live outages for the services you use, and internet speed", tools: ["status", "speed"], art: "status" }
+      ];
+      let open = null; try { open = localStorage.getItem("steer-toolkit-section"); } catch {}
+      const wrap = el("div", "sections");
+      SECTIONS.forEach(sec => {
+        const box = el("div", "section" + (open === sec.id ? " open" : ""));
+        const btn = el("button", "sec-btn"); btn.type = "button"; btn.id = "sec-" + sec.id;
+        btn.setAttribute("aria-expanded", String(open === sec.id)); btn.setAttribute("aria-controls", "sec-list-" + sec.id);
+        const art = el("div", "art"); art.innerHTML = ART[sec.art]; art.setAttribute("aria-hidden", "true");
+        const txt = el("div", "sec-txt"); txt.append(el("b", null, sec.title), el("span", null, sec.blurb));
+        const count = el("span", "sec-count", `${sec.tools.length} tools`);
+        const chev = el("span", "chev"); chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+        btn.append(art, txt, count, chev);
+        const list = el("div", "sec-list"); list.id = "sec-list-" + sec.id; list.hidden = open !== sec.id;
+        sec.tools.forEach(id => {
+          const t = TOOLS.find(x => x.id === id); if (!t) return;
+          const a = el("a", "tool-row"); a.href = "#" + t.id; a.dataset.route = t.id;
+          const ic = el("div", "art sm"); ic.innerHTML = ART[t.id]; ic.setAttribute("aria-hidden", "true");
+          const c = el("div", "tr-txt"); c.append(el("b", null, t.title), el("span", null, t.q));
+          a.append(ic, c, el("span", "tr-go", "›")); list.append(a);
+        });
+        btn.addEventListener("click", () => {
+          const willOpen = list.hidden;
+          wrap.querySelectorAll(".section").forEach(x => { x.classList.remove("open"); x.querySelector(".sec-btn").setAttribute("aria-expanded", "false"); x.querySelector(".sec-list").hidden = true; });
+          if (willOpen) { box.classList.add("open"); btn.setAttribute("aria-expanded", "true"); list.hidden = false; }
+          try { localStorage.setItem("steer-toolkit-section", willOpen ? sec.id : ""); } catch {}
+        });
+        box.append(btn, list); wrap.append(box);
       });
-      out.append(grid);
-      });
-      const why = panel("Why these checks", "They cover the routes into most small-business incidents.");
-      const w = el("div", "why");
-      [["Email", "is the way in for most attacks on small businesses, through phishing and impersonation."], ["Passwords", "reused from old breaches are the first thing attackers try against Microsoft 365 logins."], ["Websites", "with missing protections can be used to steal visitors' sessions or details."]]
-        .forEach(([b, s]) => { const d = el("div"); d.append(el("b", null, b), el("span", null, s)); w.append(d); });
-      why.append(w); out.append(why);
+      out.append(wrap);
       out.append(cta("Want this done properly across your whole business? Steer IT runs full security reviews, Cyber Essentials certification and ongoing monitoring."));
       foot.replaceChildren(el("div", null, "These tools use public data sources and passive checks only. Results are a starting point, not a full security assessment."));
     }
