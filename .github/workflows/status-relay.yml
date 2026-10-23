@@ -1,11 +1,11 @@
-# Copies Microsoft's public service status to the status-data branch every 5 minutes.
+# Copies Microsoft's public service status to the status-data branch every 15 minutes.
 # The toolkit can't read status.cloud.microsoft directly (it refuses requests from other
 # websites), but it can read files from this repository.
 name: Microsoft status relay
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:

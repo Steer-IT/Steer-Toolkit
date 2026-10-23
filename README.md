@@ -21,6 +21,6 @@ Served with GitHub Pages from the `main` branch. Open the site in Safari on iPho
 | `sw.js` | Keeps the app available offline (live checks are never cached) |
 | `apple-touch-icon.png`, `icon-*.png` | App icons |
 | `preview/` | Test copy for trying changes before they go live |
-| `.github/workflows/status-relay.yml` | Copies Microsoft's public status to the `status-data` branch every 5 minutes, because the app can't read Microsoft's feed directly |
+| `.github/workflows/status-relay.yml` | Copies Microsoft's public status to the `status-data` branch every 15 minutes, because the app can't read Microsoft's feed directly |
 
 All checks run in the visitor's browser against public services (XposedOrNot, Have I Been Pwned's Pwned Passwords, Google and Cloudflare DNS, Mozilla HTTP Observatory, crt.sh, RDAP, public status pages and Cloudflare's speed test). Saved domains and service choices stay on the device.
