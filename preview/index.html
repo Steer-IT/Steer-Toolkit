@@ -3106,8 +3106,8 @@ X-MS-Exchange-Organization-SCL: 5`;
       }).catch(() => {});
       const SECTIONS = [
         { id: "domain", title: "Domain and email", blurb: "Grades, Microsoft 365, email security, headers, DNS, blacklists and renewals", tools: ["report", "watch", "tenant", "domain", "headers", "builder", "blacklist", "website", "dns", "expiry"], art: "report" },
-        { id: "security", title: "Security", blurb: "Cyber Essentials renewals, leaked accounts and passwords", tools: ["ce", "breach", "password"], art: "password" },
-        { id: "network", title: "Services and network", blurb: "Live outages for the services you use, and internet speed", tools: ["status", "speed"], art: "status" }
+        { id: "security", title: "Security", blurb: "Leaked accounts, password strength and a password generator", tools: ["breach", "password"], art: "password" },
+        { id: "network", title: "Services and network", blurb: "Live outages, Cyber Essentials renewals and internet speed", tools: ["status", "ce", "speed"], art: "status" }
       ];
       let open = null; try { open = localStorage.getItem("steer-toolkit-section"); } catch {}
       const wrap = el("div", "sections");
