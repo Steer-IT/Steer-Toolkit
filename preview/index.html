@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>Steer IT Toolkit Preview</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Free security and IT checks from Steer IT: service status, full domain report, saved domains, record builder, blacklist check, email breaches, email domain spoofing protection, leaked passwords, website security, DNS records, domain and certificate expiry, and internet speed.">
+<meta name="description" content="Free security and IT checks from Steer IT: Microsoft 365 tenant lookup, email header analyser, Cyber Essentials tracker, service status, full domain report, saved domains, record builder, blacklist check, email breaches, email domain spoofing protection, leaked passwords, website security, DNS records, domain and certificate expiry, and internet speed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -466,6 +466,29 @@ nav.tools a.alert-minor::after { background: #b26a00; }
 @media (max-width: 460px) { .sec-btn { grid-template-columns: 48px minmax(0, 1fr) 24px; gap: 12px; padding: 14px; } .sec-btn .art { width: 48px; height: 48px; } .sec-count { display: none; } .sec-txt b { font-size: 18px; } }
 @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
 
+/* Tenant, headers, Cyber Essentials */
+.cmd-row { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.tid { font-family: var(--font-mono); font-size: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; overflow-wrap: anywhere; word-break: break-all; }
+form.search.hdr { flex-direction: column; align-items: stretch; }
+form.search.hdr textarea { font: inherit; font-family: var(--font-mono); font-size: 12.5px; padding: 12px 14px; border: 0; border-radius: 9px; background: #ffffff; color: #12273a; resize: vertical; min-height: 110px; width: 100%; }
+form.search.hdr textarea:focus-visible { outline: 3px solid var(--steer-cyan); outline-offset: 1px; }
+form.search.hdr button { align-self: flex-start; }
+details.how { margin-top: 12px; color: var(--hero-muted); font-size: 13.5px; max-width: 62ch; }
+details.how summary { cursor: pointer; color: #ffffff; font-weight: 600; }
+details.how ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+details.how b { color: #ffffff; font-weight: 600; }
+ol.hops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+ol.hops li { padding: 10px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+ol.hops li:first-child { border-top: 0; padding-top: 2px; }
+.hop-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.hop-top b { font-family: var(--font-mono); font-size: 13px; font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
+.hop-d { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+ol.hops small { font-size: 12px; color: var(--muted); font-family: var(--font-mono); overflow-wrap: anywhere; }
+ol.hops .t { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
+ol.hops .t i { display: block; height: 100%; border-radius: inherit; }
+.figures.textfigs .fig b { font-size: 17px; line-height: 1.25; overflow-wrap: anywhere; }
+.ce-sub { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); font-family: var(--font-mono); overflow-wrap: anywhere; }
+
 footer .inner { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-block: 18px 40px; display: flex; flex-direction: column; gap: 6px; }
 footer a { color: inherit; }
 @media (prefers-reduced-motion: reduce) { .dial .sweep, .spinner { animation-duration: 6s; } .bar-row .t i, .tool-card { transition: none; } }
@@ -490,6 +513,9 @@ footer a { color: inherit; }
       <a href="#dns" data-route="dns">DNS lookup</a>
       <a href="#expiry" data-route="expiry">Expiry check</a>
       <a href="#blacklist" data-route="blacklist">Blacklists</a>
+      <a href="#tenant" data-route="tenant">M365 tenant</a>
+      <a href="#headers" data-route="headers">Email headers</a>
+      <a href="#ce" data-route="ce">Cyber Essentials</a>
       <a href="#builder" data-route="builder">Record builder</a>
       <a href="#speed" data-route="speed">Speed test</a>
     </nav>
@@ -582,7 +608,7 @@ footer a { color: inherit; }
 
   let PREFILL = null;   // { route, value } handed from the full report to a tool
   let current = null;
-  const TITLES = { home: "Security Toolkit", report: "Full domain report", breach: "Breach check", domain: "Email security check", password: "Password check", website: "Website scan", dns: "DNS lookup", expiry: "Domain and certificate expiry", speed: "Speed test", builder: "DNS record builder", blacklist: "Blacklist check", watch: "My domains", status: "Service status" };
+  const TITLES = { home: "Security Toolkit", report: "Full domain report", breach: "Breach check", domain: "Email security check", password: "Password check", website: "Website scan", dns: "DNS lookup", expiry: "Domain and certificate expiry", speed: "Speed test", builder: "DNS record builder", blacklist: "Blacklist check", watch: "My domains", status: "Service status", tenant: "Microsoft 365 tenant lookup", headers: "Email header analyser", ce: "Cyber Essentials tracker" };
   function takePrefill(route) { if (PREFILL && PREFILL.route === route) { const v = PREFILL.value; PREFILL = null; return v; } return null; }
 
   // Plain-text summary of whatever result is on screen, for the share sheet
@@ -2620,6 +2646,406 @@ footer a { color: inherit; }
   })();
 
 
+  // ================= Tool: Microsoft 365 tenant lookup =================
+  const Tenant = (() => {
+    let dial;
+    const REGIONS = { EU: "Europe", NA: "North America", AS: "Asia Pacific", OC: "Oceania", SA: "South America", AF: "Africa", ME: "Middle East", WW: "Worldwide (multi-region)", USGov: "US Government" };
+    async function j(url) {
+      const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 12000);
+      try { const r = await fetch(url, { signal: ctrl.signal }); const body = await r.json().catch(() => null); return { status: r.status, body }; } catch { return null; } finally { clearTimeout(t); }
+    }
+    async function fetchData(domain) {
+      const cname = (n) => dns(n, "CNAME").then(r => answers(r, "CNAME").map(x => x.replace(/\.$/, "").toLowerCase())).catch(() => []);
+      const [oidc, realm, mx, txt, auto, lync, enrol, reg, s1, s2] = await Promise.all([
+        j(`https://login.microsoftonline.com/${encodeURIComponent(domain)}/v2.0/.well-known/openid-configuration`),
+        j(`https://login.microsoftonline.com/getuserrealm.srf?login=${encodeURIComponent("user@" + domain)}&json=1`),
+        dns(domain, "MX").then(r => answers(r, "MX").map(x => x.split(/\s+/).pop().replace(/\.$/, "").toLowerCase())).catch(() => null),
+        dns(domain, "TXT").then(r => answers(r, "TXT")).catch(() => []),
+        cname("autodiscover." + domain), cname("lyncdiscover." + domain), cname("enterpriseenrollment." + domain), cname("enterpriseregistration." + domain),
+        cname("selector1._domainkey." + domain), cname("selector2._domainkey." + domain)
+      ]);
+      if (!oidc && !realm && mx === null) return { offline: true };
+      let tenantId = null, region = null, cloud = null;
+      if (oidc && oidc.body && oidc.body.issuer) {
+        tenantId = (oidc.body.issuer.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i) || [])[0] || null;
+        region = oidc.body.tenant_region_scope || null; cloud = oidc.body.cloud_instance_name || null;
+      }
+      const rb = realm && realm.body ? realm.body : null;
+      const dkimTargets = s1.concat(s2);
+      let initial = null;
+      for (const t of dkimTargets) { const m = t.match(/\._domainkey\.([a-z0-9-]+)\.onmicrosoft\.com$/) || t.match(/\._domainkey\.([a-z0-9-]+)\.[a-z0-9-]+\.dkim\.mail\.microsoft$/); if (m) { initial = m[1] + ".onmicrosoft.com"; break; } }
+      return {
+        tenantId, region, cloud, initial, oidcOk: !!oidc, realmOk: !!rb,
+        ns: rb ? rb.NameSpaceType : null, brand: rb ? rb.FederationBrandName : null, authUrl: rb ? rb.AuthURL || null : null,
+        mx: mx || [], exo: (mx || []).some(h => /mail\.protection\.outlook\.com$|\.mx\.microsoft$/.test(h)), msTxt: txt.some(t => /^MS=ms\d+/i.test(t)),
+        autodiscover: auto.some(t => /outlook\.com$/.test(t)), teams: lync.some(t => /lync\.com$|online\.lync|teams/.test(t)),
+        intune: enrol.some(t => /manage\.microsoft\.com$/.test(t)) || reg.some(t => /windows\.net$/.test(t)),
+        dkim: dkimTargets.some(t => /onmicrosoft\.com$|dkim\.mail\.microsoft$/.test(t))
+      };
+    }
+    function render(domain, d, isExample) {
+      out.replaceChildren();
+      const on = !!d.tenantId;
+      dial.set({ value: on ? "M365" : "NO", sub: on ? "TENANT FOUND" : "NOT FOUND", colour: on ? "#6fd59c" : "#f3b75c" });
+      const signIn = d.ns === "Federated" ? `Federated${d.authUrl ? " via " + (d.authUrl.match(/^https?:\/\/([^/]+)/) || [])[1] : ""}` : d.ns === "Managed" ? "Microsoft (cloud accounts)" : d.ns ? d.ns : "Unknown";
+      const v = verdict(on ? "good" : "warn", on ? "Microsoft 365 tenant" : "No tenant found",
+        on ? `${domain} belongs to ${d.brand ? "“" + d.brand + "”" : "a Microsoft 365 tenant"}` : `${domain} isn't linked to a Microsoft 365 tenant`,
+        on ? `Region: ${REGIONS[d.region] || d.region || "unknown"}. Sign-in is ${d.ns === "Federated" ? "handled by another identity provider" : "handled by Microsoft"}.${d.exo ? " Email runs through Exchange Online." : " Email doesn't run through Exchange Online."}` :
+        (d.exo ? "Its email points at Exchange Online, but the domain isn't verified in a tenant that Microsoft will reveal." : "Microsoft didn't recognise the domain. It may use Google Workspace or another provider."), isExample);
+      out.append(v);
+      const tf = figures([[d.brand || "—", "tenant name"], [REGIONS[d.region] || d.region || "—", "data region"], [d.ns === "Federated" ? "Federated" : d.ns === "Managed" ? "Managed" : "—", "sign-in type"], [d.initial || "—", "initial domain"]]);
+      tf.classList.add("textfigs"); out.append(tf);
+      if (on) {
+        const p = panel("Tenant ID", "Needed for Entra ID, Intune, Defender and most partner tools.");
+        const row = el("div", "cmd-row"); row.append(el("code", "tid", d.tenantId), copyButton(d.tenantId));
+        p.append(row); out.append(p);
+      }
+      const checks = [
+        { status: d.exo ? "pass" : "info", name: "Exchange Online email", what: d.exo ? `Mail is delivered to Microsoft (${d.mx[0]}).` : d.mx.length ? `Mail goes to ${d.mx[0]}, not Exchange Online.` : "No mail servers found.", label: d.exo ? "Yes" : "No" },
+        { status: d.msTxt ? "pass" : "info", name: "Domain verified in Microsoft 365", what: d.msTxt ? "An MS= verification record is published." : "No MS= record. Many tenants remove it after verifying, so this alone doesn't mean much.", label: d.msTxt ? "Yes" : "Not seen" },
+        { status: d.autodiscover ? "pass" : (d.exo ? "warn" : "info"), name: "Autodiscover", what: d.autodiscover ? "Outlook can set itself up automatically." : d.exo ? "Missing. Outlook may struggle to find the mailbox when setting up new devices." : "Not pointed at Microsoft.", label: d.autodiscover ? "Set" : "Missing" },
+        { status: d.dkim ? "pass" : (d.exo ? "warn" : "info"), name: "DKIM signing", what: d.dkim ? "Microsoft DKIM selectors are published." : d.exo ? "Not set up. Turn on DKIM in Microsoft Defender to improve deliverability." : "No Microsoft DKIM selectors.", label: d.dkim ? "Set" : "Missing" },
+        { status: d.teams ? "pass" : "info", name: "Teams / Skype records", what: d.teams ? "Lyncdiscover points at Microsoft." : "Not set. Only needed for some Teams federation and older clients.", label: d.teams ? "Set" : "Not set" },
+        { status: d.intune ? "pass" : "info", name: "Intune enrolment records", what: d.intune ? "Devices can enrol in Intune using just the email address." : "Not set. Add these if you manage devices with Intune.", label: d.intune ? "Set" : "Not set" }
+      ];
+      if (d.ns === "Federated") checks.push({ status: "info", name: "Federated sign-in", what: `Passwords are checked by ${d.authUrl ? (d.authUrl.match(/^https?:\/\/([^/]+)/) || [])[1] : "another identity provider"}, not Microsoft. Check it's still needed: many tenants move to cloud sign-in.`, label: "Note" });
+      const pc = panel("Microsoft 365 setup", "Read from Microsoft's sign-in service and public DNS."); pc.append(checkList(checks)); out.append(pc);
+      if (!d.oidcOk && !d.realmOk) out.append(el("p", "note warnnote", "Microsoft's sign-in service didn't respond, so the tenant details may be incomplete."));
+      out.append(cta("Taking on a Microsoft 365 tenant? Steer IT can review its security, licensing and setup, and look after it day to day."));
+    }
+    const SAMPLE = { domain: "northbay-accounts.co.uk", data: { tenantId: "4f8c2a1e-7b3d-4c6e-9a2f-1d5e8b7c3a90", region: "EU", cloud: "microsoftonline.com", initial: "northbayaccounts.onmicrosoft.com", oidcOk: true, realmOk: true, ns: "Managed", brand: "Northbay Accounts Ltd", authUrl: null, mx: ["northbay-accounts-co-uk.mail.protection.outlook.com"], exo: true, msTxt: true, autodiscover: true, teams: true, intune: false, dkim: true } };
+    let busy = false;
+    async function run(domain, btn) {
+      if (busy) return; busy = true; btn.disabled = true;
+      loading(`Asking Microsoft about ${domain}…`); dial.set({ scanning: true });
+      try {
+        const d = await fetchData(domain);
+        if (d.offline) { dial.set(); return errorBox("Couldn't reach Microsoft", NET_ERR); }
+        render(domain, d, false);
+      } catch { dial.set(); errorBox("Couldn't look up the tenant", NET_ERR); }
+      finally { busy = false; btn.disabled = false; }
+    }
+    function mount() {
+      const f = searchForm({ id: "tenant-input", label: "Domain or email address", placeholder: "clientdomain.co.uk", button: "Look up tenant", inputmode: "url" });
+      dial = buildHero({ eyebrow: "Microsoft 365 tenant lookup", title: 'Is it on <span class="hl">Microsoft 365</span>?', lede: "Finds the Microsoft 365 tenant behind any domain: tenant ID and name, data region, how sign-in works, and whether email, Autodiscover, DKIM, Teams and Intune records are set up.", form: f.form,
+        fine: [document.createTextNode("Uses Microsoft's public sign-in service and DNS. No sign-in needed. "), exLink("See an example result", () => { f.input.value = SAMPLE.domain; render(SAMPLE.domain, SAMPLE.data, true); })] });
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const h = cleanHost(f.input.value).replace(/^www\./, "");
+        if (!validHost(h)) { errorBox("That doesn't look like a domain", "Enter a domain like clientdomain.co.uk, or an email address on it."); f.input.focus(); return; }
+        f.input.value = h; run(h, f.button); });
+      render(SAMPLE.domain, SAMPLE.data, true);
+      foot.replaceChildren(el("div", null, "The tenant name is what the organisation shows on its Microsoft sign-in page. The initial .onmicrosoft.com domain is worked out from DKIM records, so it only appears when DKIM is set up."));
+      const pre = takePrefill("tenant"); if (pre) { f.input.value = pre; run(pre, f.button); }
+    }
+    return { mount };
+  })();
+
+  // ================= Tool: Email header analyser =================
+  const Headers = (() => {
+    let dial, area = null;
+    const isPrivate = (ip) => /^(10\.|127\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|::1|fe80:|fc|fd)/i.test(ip);
+    const domainOf = (addr) => ((String(addr || "").match(/@([a-z0-9.-]+)/i) || [])[1] || "").toLowerCase();
+    const orgDomain = (d) => { const p = d.split("."); return p.slice(/\.(co|org|ac|gov|net|ltd|plc|me|com)\.[a-z]{2}$/.test(d) ? -3 : -2).join("."); };
+    function parse(raw) {
+      const text = String(raw).replace(/\r\n/g, "\n");
+      const headPart = text.split(/\n\s*\n/)[0];
+      const lines = headPart.split("\n"), fields = [];
+      for (const ln of lines) {
+        if (/^[ \t]/.test(ln) && fields.length) fields[fields.length - 1][1] += " " + ln.trim();
+        else { const m = ln.match(/^([A-Za-z0-9-]+):\s*(.*)$/); if (m) fields.push([m[1].toLowerCase(), m[2]]); }
+      }
+      const get = (n) => (fields.find(f => f[0] === n) || [])[1] || null;
+      const all = (n) => fields.filter(f => f[0] === n).map(f => f[1]);
+      return { fields, get, all };
+    }
+    function analyse(raw) {
+      const h = parse(raw);
+      if (!h.fields.length || !h.get("received") && !h.get("from")) return null;
+      const from = h.get("from") || "", fromAddr = (from.match(/<([^>]+)>/) || [null, from])[1].trim(), fromName = from.replace(/<[^>]+>/, "").replace(/"/g, "").trim();
+      const fromDom = domainOf(fromAddr), replyTo = h.get("reply-to"), rpath = h.get("return-path"), rDom = domainOf(replyTo), pDom = domainOf(rpath);
+      const authLines = h.all("authentication-results").concat(h.all("arc-authentication-results"));
+      const auth = authLines.join(" ; ");
+      const res = (k) => { const m = auth.match(new RegExp("\\b" + k + "=([a-z]+)", "i")); return m ? m[1].toLowerCase() : null; };
+      let spf = res("spf"), dkim = res("dkim"), dmarc = res("dmarc"), compauth = res("compauth");
+      if (!spf) { const rs = h.get("received-spf"); if (rs) spf = (rs.match(/^(\w+)/) || [])[1].toLowerCase(); }
+      let dkimD = (auth.match(/header\.d=([a-z0-9.-]+)/i) || [])[1] || ((h.get("dkim-signature") || "").match(/\bd=([a-z0-9.-]+)/i) || [])[1] || null;
+      if (dkimD && !dkimD.includes(".")) dkimD = null;
+      const forefront = h.get("x-forefront-antispam-report") || "";
+      const ff = (k) => (forefront.match(new RegExp("\\b" + k + ":([^;]+)", "i")) || [])[1] || null;
+      const scl = parseInt(h.get("x-ms-exchange-organization-scl") || ff("SCL") || "", 10);
+      const bcl = parseInt(((h.get("x-microsoft-antispam") || "").match(/BCL:(\d+)/i) || [])[1] || "", 10);
+      // Received hops, oldest first
+      const hops = h.all("received").reverse().map(r => {
+        const fromHost = (r.match(/\bfrom\s+(\S+)/i) || [])[1] || "";
+        const by = (r.match(/\bby\s+(\S+)/i) || [])[1] || "";
+        const ip = (r.match(/\[((?:\d{1,3}\.){3}\d{1,3}|[0-9a-f:]{3,})\]/i) || r.match(/\(((?:\d{1,3}\.){3}\d{1,3})\)/) || [])[1] || null;
+        const dt = r.includes(";") ? new Date(r.slice(r.lastIndexOf(";") + 1).trim().replace(/\s*\([A-Z]{2,5}\)\s*$/, "")) : null;
+        return { fromHost, by, ip, at: dt && !isNaN(dt) ? dt : null };
+      });
+      hops.forEach((x, i) => { x.delay = i && x.at && hops[i - 1].at ? Math.max(0, (x.at - hops[i - 1].at) / 1000) : null; });
+      const firstPublic = hops.find(x => x.ip && !isPrivate(x.ip));
+      const senderIp = ff("CIP") || (h.get("x-originating-ip") || "").replace(/[\[\]]/g, "") || (firstPublic && firstPublic.ip) || null;
+      const total = hops.length > 1 && hops[0].at && hops[hops.length - 1].at ? (hops[hops.length - 1].at - hops[0].at) / 1000 : null;
+      // Red flags
+      const flags = [];
+      const nameEmail = (fromName.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i) || [])[0];
+      if (nameEmail && domainOf(nameEmail) !== fromDom) flags.push({ status: "fail", name: "Display name hides a different address", what: `The name shows “${nameEmail}” but the email really came from ${fromAddr}.` });
+      if (rDom && fromDom && orgDomain(rDom) !== orgDomain(fromDom)) flags.push({ status: /gmail|outlook\.com|hotmail|yahoo|icloud|proton/.test(rDom) ? "fail" : "warn", name: "Replies go somewhere else", what: `Reply-To is ${replyTo.replace(/.*<|>.*/g, "")}, not the sender's domain. A classic sign of invoice and payment fraud.` });
+      const hFrom = ((auth.match(/header\.from=([a-z0-9.-]+)/i) || [])[1] || fromDom).toLowerCase();
+      if (dmarc && /fail/.test(dmarc)) flags.push({ status: "fail", name: "DMARC failed", what: `The message failed ${hFrom}'s own anti-spoofing policy. It may not really be from them.` });
+      if (compauth === "fail") flags.push({ status: "fail", name: "Microsoft composite check failed", what: "Microsoft 365 couldn't confirm the sender is genuine." });
+      if (spf && /fail|softfail/.test(spf) && dmarc !== "pass") flags.push({ status: "warn", name: `SPF ${spf}`, what: "The sending server isn't listed in the sender's SPF record." });
+      if (dkimD && fromDom && orgDomain(dkimD) !== orgDomain(fromDom) && dmarc !== "pass") flags.push({ status: "warn", name: "Signed by a different domain", what: `The DKIM signature is from ${dkimD}, not ${fromDom}.` });
+      if (pDom && fromDom && orgDomain(pDom) !== orgDomain(fromDom) && dmarc !== "pass") flags.push({ status: "info", name: "Bounce address on another domain", what: `Return-Path is ${pDom}. Normal for newsletters and mailing services, suspicious otherwise.` });
+      if (/xn--/.test(fromDom)) flags.push({ status: "fail", name: "Look-alike characters in the domain", what: `${fromDom} uses international characters that can imitate a real brand.` });
+      if (scl >= 5) flags.push({ status: "warn", name: `Marked as spam by Microsoft (SCL ${scl})`, what: "Exchange Online's filter scored this as spam." });
+      if (bcl >= 7) flags.push({ status: "info", name: `Bulk mail (BCL ${bcl})`, what: "Sent by a bulk mailer. Usually marketing rather than malicious." });
+      if (total != null && total > 600) flags.push({ status: "warn", name: `Took ${Math.round(total / 60)} minutes to arrive`, what: "Look at the route below for the hop with the longest delay." });
+      const failCount = flags.filter(f => f.status === "fail").length, warnCount = flags.filter(f => f.status === "warn").length;
+      return { from, fromAddr, fromName, fromDom, replyTo, rpath, subject: h.get("subject"), date: h.get("date"), msgId: h.get("message-id"), to: h.get("to"),
+        spf, dkim, dkimD, dmarc, compauth, scl: isNaN(scl) ? null : scl, bcl: isNaN(bcl) ? null : bcl, country: ff("CTRY"), senderIp, hops, total, flags, failCount, warnCount, hasAuth: !!(spf || dkim || dmarc) };
+    }
+    const fmtSecs = (s) => s == null ? "—" : s < 1 ? "<1 s" : s < 90 ? `${Math.round(s)} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${(s / 3600).toFixed(1)} h`;
+    const authState = (v) => !v ? "info" : v === "pass" ? "pass" : /none|neutral|bestguesspass/.test(v) ? "warn" : "fail";
+    function render(a, isExample) {
+      out.replaceChildren();
+      const st = a.failCount ? "bad" : (a.warnCount || !a.hasAuth) ? "warn" : "good";
+      dial.set({ value: a.failCount + a.warnCount, sub: a.failCount + a.warnCount === 1 ? "RED FLAG" : "RED FLAGS", colour: st === "bad" ? "#ff8b77" : st === "warn" ? "#f3b75c" : "#6fd59c", blips: a.failCount });
+      out.append(verdict(st, st === "bad" ? "Suspicious" : st === "warn" ? "Check carefully" : "Looks genuine",
+        st === "bad" ? `This email shows signs of being fake` : st === "warn" ? (a.hasAuth ? "Mostly fine, with some things to check" : "No authentication results to go on") : `Sent by ${a.fromDom || "the sender"} and passed authentication`,
+        st === "bad" ? "Don't click links, open attachments or act on payment requests in it. Report it and delete it." : st === "warn" ? (a.hasAuth ? "Nothing conclusive, but read the points below before trusting it." : "These headers don't include SPF, DKIM or DMARC results. Copy the headers from the recipient's mailbox, not the sender's.") : "SPF, DKIM and DMARC checks passed and nothing unusual stands out. Still be wary of unexpected requests.",
+        isExample));
+      out.append(figures([[a.spf || "—", "SPF", `var(--${authState(a.spf) === "pass" ? "good" : authState(a.spf) === "fail" ? "bad" : "muted"})`], [a.dkim || "—", "DKIM", `var(--${authState(a.dkim) === "pass" ? "good" : authState(a.dkim) === "fail" ? "bad" : "muted"})`], [a.dmarc || "—", "DMARC", `var(--${authState(a.dmarc) === "pass" ? "good" : authState(a.dmarc) === "fail" ? "bad" : "muted"})`], [fmtSecs(a.total), "total delivery time", a.total > 600 ? "var(--warn)" : ""]]));
+      const g2 = el("div", "grid2");
+      const p1 = panel("Red flags", a.flags.length ? "Most serious first." : "Nothing unusual found.");
+      const order = { fail: 0, warn: 1, info: 2 };
+      p1.append(checkList(a.flags.length ? a.flags.slice().sort((x, y) => order[x.status] - order[y.status]) : [{ status: "pass", name: "No red flags", what: "Sender, reply address and authentication all line up." }]));
+      const p2 = panel("Message details", "Taken from the headers you pasted.");
+      const dl = el("dl", "kv");
+      const row = (k, v) => { if (!v) return; dl.append(el("dt", null, k)); dl.append(el("dd", null, v)); };
+      row("From", a.from); row("Reply-To", a.replyTo); row("Return-Path", a.rpath); row("Subject", a.subject); row("Sent", a.date); row("DKIM signed by", a.dkimD);
+      if (a.compauth) row("Microsoft compauth", a.compauth); if (a.scl != null) row("Spam score (SCL)", String(a.scl)); if (a.country) row("Sending country", a.country);
+      p2.append(dl);
+      if (a.senderIp) {
+        const ipRow = el("div", "cmd-row"); ipRow.style.marginTop = "12px";
+        ipRow.append(el("span", null, "Sending server: "), el("code", "tid", a.senderIp));
+        if (/^\d{1,3}(\.\d{1,3}){3}$/.test(a.senderIp)) { const b = el("button", "copybtn", "Check blacklists →"); b.type = "button"; b.addEventListener("click", () => { PREFILL = isExample ? null : { route: "blacklist", value: a.senderIp }; go("blacklist", true); }); ipRow.append(b); }
+        p2.append(ipRow);
+      }
+      g2.append(p1, p2); out.append(g2);
+      if (a.hops.length) {
+        const ph = panel("Route the email took", "Oldest first. Long bars show where it was held up.");
+        const max = Math.max(1, ...a.hops.map(x => x.delay || 0));
+        const ol = el("ol", "hops");
+        a.hops.forEach((x, i) => {
+          const li = el("li"); const top = el("div", "hop-top");
+          top.append(el("b", null, x.by || x.fromHost || "Unknown server"), el("span", "hop-d", i ? fmtSecs(x.delay) : "Start"));
+          li.append(top);
+          const sub = [x.fromHost ? "from " + x.fromHost : "", x.ip ? x.ip : ""].filter(Boolean).join(" · "); if (sub) li.append(el("small", null, sub));
+          if (i) { const bar = el("div", "t"); const fi = el("i"); fi.style.width = Math.max(2, (x.delay || 0) / max * 100) + "%"; fi.style.background = (x.delay || 0) > 300 ? "var(--bad)" : (x.delay || 0) > 60 ? "var(--warn)" : "var(--steer-cyan)"; bar.append(fi); li.append(bar); }
+          ol.append(li);
+        });
+        ph.append(ol); out.append(ph);
+      }
+      out.append(stepsPanel("If it's suspicious", "What to tell the user.", [
+        ["Don't act on it", "no clicking, no replying, no payments or bank detail changes."],
+        ["Report it", "use Report phishing in Outlook, or forward it to your IT team."],
+        ["Check with the sender", "using a phone number you already have, not one in the email."],
+        ["If someone clicked", "change their password, check MFA and look for new inbox rules straight away."]
+      ]));
+      out.append(cta("Phishing getting through? Steer IT can tighten your email filtering and train staff to spot it."));
+    }
+    const SAMPLE = `Received: from DB9PR02MB7130.eurprd02.prod.outlook.com (2603:10a6:10:2e5::9) by AM6PR02MB4321.eurprd02.prod.outlook.com with HTTPS; Thu, 22 Oct 2026 09:14:52 +0000
+Received: from DB5PEPF00014B8F.eurprd02.prod.outlook.com (2603:10a6:10:2c4::5) by DB9PR02MB7130.eurprd02.prod.outlook.com (2603:10a6:10:2e5::9) with Microsoft SMTP Server; Thu, 22 Oct 2026 09:14:50 +0000
+Received: from mail.invoice-portal-secure.com (203.0.113.77) by DB5PEPF00014B8F.mail.protection.outlook.com (10.167.8.198) with Microsoft SMTP Server; Thu, 22 Oct 2026 09:14:49 +0000
+Received: from [192.168.1.20] (unknown [198.51.100.14]) by mail.invoice-portal-secure.com (Postfix) with ESMTPSA; Thu, 22 Oct 2026 09:02:11 +0000
+Authentication-Results: spf=softfail (sender IP is 203.0.113.77) smtp.mailfrom=invoice-portal-secure.com; dkim=none (message not signed) header.d=none; dmarc=none action=none header.from=invoice-portal-secure.com; compauth=fail reason=601
+From: "accounts@northbay-accounts.co.uk" <billing@invoice-portal-secure.com>
+Reply-To: northbay.accounts.payments@gmail.com
+Return-Path: billing@invoice-portal-secure.com
+To: finance@harbourside-dental.co.uk
+Subject: Updated bank details - invoice 40281 overdue
+Date: Thu, 22 Oct 2026 10:02:09 +0100
+Message-ID: <a81c2e@invoice-portal-secure.com>
+X-Forefront-Antispam-Report: CIP:203.0.113.77;CTRY:NG;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM
+X-MS-Exchange-Organization-SCL: 5`;
+    function mount() {
+      const f = el("form", "search hdr"); f.noValidate = true;
+      const lab = el("label", "sr", "Email headers"); lab.htmlFor = "hdr-input";
+      area = el("textarea"); area.id = "hdr-input"; area.rows = 5; area.placeholder = "Paste the full message headers here"; area.spellcheck = false;
+      const btn = el("button", "primary", "Analyse headers"); btn.type = "submit";
+      f.append(lab, area, btn);
+      const how = el("details", "how");
+      how.append(el("summary", null, "How do I get the headers?"));
+      const ul = el("ul");
+      [["Outlook (Windows)", "open the email, File → Properties, then copy everything in Internet headers."], ["Outlook on the web / new Outlook", "… menu → View → View message details, then copy."], ["Gmail", "⋮ menu → Show original → Copy to clipboard."], ["Apple Mail (Mac)", "View → Message → All Headers. The iPhone Mail app can't show headers, so forward the email to a computer."]]
+        .forEach(([b, s]) => { const li = el("li"); li.append(el("b", null, b + ": "), document.createTextNode(s)); ul.append(li); });
+      how.append(ul);
+      dial = buildHero({ eyebrow: "Email header analyser", title: 'Is this email <span class="hl">really from them</span>?', lede: "Paste an email's headers to see who actually sent it, whether it passed SPF, DKIM and DMARC, where it came from and why it was delayed.", form: f,
+        fine: [document.createTextNode("Analysed on your device. Nothing you paste is sent anywhere. "), exLink("See an example result", () => { area.value = ""; render(analyse(SAMPLE), true); })] });
+      heroEl.querySelector("h1").parentNode.append(how);
+      f.addEventListener("submit", (e) => {
+        e.preventDefault(); const v = area.value.trim();
+        if (!v) { errorBox("Paste some headers first", "Copy the full headers from the email, then paste them in the box."); area.focus(); return; }
+        const a = analyse(v);
+        if (!a) { errorBox("Those don't look like email headers", "Paste the full headers, starting with lines like Received:, From: and Subject:."); return; }
+        render(a, false); out.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      render(analyse(SAMPLE), true);
+      foot.replaceChildren(el("div", null, "Results come from the Authentication-Results headers added by the receiving mail server, so paste headers from the recipient's mailbox. Microsoft 365 spam scores (SCL and BCL) appear when the email went through Exchange Online."));
+    }
+    return { mount };
+  })();
+
+  // ================= Tool: Cyber Essentials tracker =================
+  const CyberEss = (() => {
+    let dial, editing = null;
+    const KEY = "steer-toolkit-ce-v1";
+    let mem = null;
+    const load = () => { if (mem) return mem; try { mem = JSON.parse(localStorage.getItem(KEY) || "[]"); if (!Array.isArray(mem)) mem = []; } catch { mem = mem || []; } return mem; };
+    const save = (l) => { mem = l; try { localStorage.setItem(KEY, JSON.stringify(l)); } catch {} };
+    const DAY = 86400000;
+    const addYear = (iso) => { if (!iso) return null; const d = new Date(iso + "T00:00:00Z"); d.setUTCFullYear(d.getUTCFullYear() + 1); return d.toISOString().slice(0, 10); };
+    const daysTo = (iso) => iso ? Math.ceil((new Date(iso + "T00:00:00Z") - Date.now()) / DAY) : null;
+    const fmtD = (iso) => iso ? new Date(iso + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) : "";
+    function certState(c) {
+      if (!c || !c.date) return { key: "none", label: "Not held", pill: "", days: null };
+      const exp = c.expiry || addYear(c.date), d = daysTo(exp);
+      if (d < 0) return { key: "expired", label: `Expired ${fmtD(exp)}`, pill: "bad", days: d, exp };
+      if (d <= 30) return { key: "due", label: `Expires in ${d} day${d === 1 ? "" : "s"}`, pill: "bad", days: d, exp };
+      if (d <= 60) return { key: "soon", label: `Renew soon: ${fmtD(exp)}`, pill: "warn", days: d, exp };
+      return { key: "valid", label: `Valid until ${fmtD(exp)}`, pill: "good", days: d, exp };
+    }
+    const soonest = (e) => { const s = [certState(e.ce), certState(e.plus)].filter(x => x.days != null); return s.length ? Math.min(...s.map(x => x.days)) : null; };
+    function summary(list) {
+      const all = list.map(e => ({ e, ce: certState(e.ce), plus: certState(e.plus) }));
+      return { all, expired: all.filter(x => x.ce.key === "expired" || x.plus.key === "expired"), due: all.filter(x => ["due", "soon"].includes(x.ce.key) || ["due", "soon"].includes(x.plus.key)), urgent: all.filter(x => ["due", "expired"].includes(x.ce.key) || ["due", "expired"].includes(x.plus.key)) };
+    }
+    function editor(entry, onDone) {
+      const p = panel(entry.name ? `Edit ${entry.name}` : "Add a client", "Certificates last 12 months from the certification date. Expiry is worked out for you.");
+      const box = el("div", "opts");
+      const inp = (id, label, value, type, ph) => { const i = el("input"); i.type = type || "text"; i.id = id; i.value = value || ""; if (ph) i.placeholder = ph; const f = el("div", "field2"); const l = el("label", null, label); l.htmlFor = id; f.append(l, i); return [f, i]; };
+      const [fName, iName] = inp("ce-name", "Client name", entry.name, "text", "Client Ltd");
+      const row1 = el("div", "fields2"); const [fCn, iCn] = inp("ce-num", "Cyber Essentials certificate number", entry.ce && entry.ce.num, "text", "e.g. 1a2b3c4d-…"); const [fCd, iCd] = inp("ce-date", "Cyber Essentials certification date", entry.ce && entry.ce.date, "date");
+      row1.append(fCn, fCd);
+      const row2 = el("div", "fields2"); const [fPn, iPn] = inp("cep-num", "Cyber Essentials Plus certificate number", entry.plus && entry.plus.num, "text", "Leave blank if not held"); const [fPd, iPd] = inp("cep-date", "Cyber Essentials Plus certification date", entry.plus && entry.plus.date, "date");
+      row2.append(fPn, fPd);
+      const [fNotes, iNotes] = inp("ce-notes", "Notes (optional)", entry.notes, "text", "e.g. scope, certification body, contact");
+      const btns = el("div", "genrow");
+      const saveB = el("button", "btnp", "Save client"); saveB.type = "button";
+      const cancel = el("button", "copybtn", "Cancel"); cancel.type = "button";
+      const msg = el("span", "note warnnote");
+      saveB.addEventListener("click", () => {
+        const name = iName.value.trim(); if (!name) { msg.textContent = "Add the client's name."; iName.focus(); return; }
+        const list = load(), now = new Date().toISOString();
+        const rec = { id: entry.id || "c" + Date.now().toString(36), name, ce: iCd.value ? { num: iCn.value.trim(), date: iCd.value } : null, plus: iPd.value ? { num: iPn.value.trim(), date: iPd.value } : null, notes: iNotes.value.trim(), added: entry.added || now };
+        const i = list.findIndex(x => x.id === rec.id); if (i >= 0) list[i] = rec; else list.push(rec);
+        save(list); editing = null; onDone();
+      });
+      cancel.addEventListener("click", () => { editing = null; onDone(); });
+      btns.append(saveB, cancel, msg);
+      box.append(fName, row1, row2, fNotes, btns); p.append(box);
+      setTimeout(() => iName.focus(), 50);
+      return p;
+    }
+    function monthsChart(list) {
+      const now = new Date(); const buckets = Array.from({ length: 12 }, (_, i) => { const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + i, 1)); return { d, n: 0, plus: 0 }; });
+      list.forEach(e => [["ce", "n"], ["plus", "plus"]].forEach(([k, key]) => { const s = certState(e[k]); if (!s.exp || s.days < 0) return; const x = new Date(s.exp + "T00:00:00Z"); const idx = (x.getUTCFullYear() - now.getUTCFullYear()) * 12 + x.getUTCMonth() - now.getUTCMonth(); if (idx >= 0 && idx < 12) buckets[idx][key]++; }));
+      const max = Math.max(1, ...buckets.map(b => b.n + b.plus));
+      const W = 460, H = 150, padL = 22, padB = 22, padT = 10, iw = W - padL - 6, ih = H - padB - padT, bw = iw / 12;
+      const svg = sv("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Renewals due by month" });
+      for (let v = 0; v <= max; v++) { const y = padT + ih - ih * v / max; svg.append(sv("line", { x1: padL, x2: W - 6, y1: y, y2: y, stroke: "var(--line)", "stroke-dasharray": v ? "2 3" : "" })); const t = sv("text", { x: padL - 6, y: y + 3, "text-anchor": "end" }); t.textContent = v; svg.append(t); }
+      buckets.forEach((b, i) => {
+        const x = padL + i * bw + bw * .18, w = bw * .64; let y = padT + ih;
+        [["n", "var(--steer-cyan)"], ["plus", "var(--steer-blue)"]].forEach(([k, c]) => { if (!b[k]) return; const h = ih * b[k] / max; y -= h; svg.append(sv("rect", { x, y, width: w, height: h, rx: 2, fill: i < 2 ? (k === "n" ? "var(--warn)" : "var(--bad)") : c })); });
+        const t = sv("text", { x: padL + i * bw + bw / 2, y: H - 6, "text-anchor": "middle" }); t.textContent = b.d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" }).slice(0, 3); svg.append(t);
+      });
+      return svg;
+    }
+    const SAMPLE = (() => { const d = (offsetDays) => new Date(Date.now() - (365 - offsetDays) * DAY).toISOString().slice(0, 10); return [
+      { id: "s1", name: "Northbay Accounts Ltd", ce: { num: "8f2c41d0-ce", date: d(18) }, plus: { num: "8f2c41d0-cep", date: d(25) }, notes: "Whole organisation" },
+      { id: "s2", name: "Harbourside Dental", ce: { num: "1b7e90aa-ce", date: d(52) }, plus: null, notes: "" },
+      { id: "s3", name: "Taff Valley Joinery", ce: { num: "c03d77e2-ce", date: d(-9) }, plus: null, notes: "Lapsed: chase renewal" },
+      { id: "s4", name: "Cardiff Bay Lettings", ce: { num: "77aa12f0-ce", date: d(240) }, plus: { num: "77aa12f0-cep", date: d(262) }, notes: "" }
+    ]; })();
+    function render() {
+      out.replaceChildren();
+      const saved = load(), isExample = !saved.length, list = isExample ? SAMPLE : saved;
+      if (editing) { out.append(editor(editing, render)); }
+      const s = summary(list);
+      const holdsCe = s.all.filter(x => ["valid", "soon", "due"].includes(x.ce.key)).length, holdsPlus = s.all.filter(x => ["valid", "soon", "due"].includes(x.plus.key)).length;
+      dial.set({ value: s.urgent.length, sub: s.urgent.length === 1 ? "URGENT" : "URGENT", colour: s.urgent.length ? "#ff8b77" : s.due.length ? "#f3b75c" : "#6fd59c", blips: s.urgent.length });
+      const st = s.urgent.length ? "bad" : s.due.length ? "warn" : "good";
+      const v = verdict(st, isExample ? "Example clients" : "Saved on this device",
+        isExample ? "Track every client's Cyber Essentials" : s.expired.length ? `${s.expired.length} certificate${s.expired.length === 1 ? " has" : "s have"} expired` : s.due.length ? `${s.due.length} client${s.due.length === 1 ? "" : "s"} due for renewal soon` : `All ${list.length} client${list.length === 1 ? "" : "s"} are certified`,
+        isExample ? "These are examples. Add your first client and they disappear. The list is kept on this phone only; use Copy list to back it up." : "Sorted by whichever certificate runs out first. Amber means renew within 60 days, red within 30 days or expired.", isExample);
+      if (!isExample) {
+        const add = el("button", "sharebtn", "+ Add client"); add.type = "button"; add.addEventListener("click", () => { editing = {}; render(); window.scrollTo({ top: out.offsetTop - 80, behavior: "smooth" }); });
+        v.querySelector(".txt").append(add);
+      }
+      out.append(v);
+      out.append(figures([[String(list.length), "clients tracked"], [String(holdsCe), "hold Cyber Essentials", "var(--good)"], [String(holdsPlus), "hold Cyber Essentials Plus", "var(--good)"], [String(s.due.length + s.expired.length), "due within 60 days or expired", s.urgent.length ? "var(--bad)" : s.due.length ? "var(--warn)" : ""]]));
+      const pl = panel("Clients", isExample ? "How the list looks once you've added a few." : "Tap Verify to check a certificate on IASME's official register.");
+      const box = el("div", "wlist");
+      list.slice().sort((a, b) => (soonest(a) ?? 1e9) - (soonest(b) ?? 1e9)).forEach(e => {
+        const ce = certState(e.ce), plus = certState(e.plus), sd = soonest(e);
+        const r = el("div", "wrow share-line");
+        const lc = (t) => t.charAt(0).toLowerCase() + t.slice(1);
+        r.dataset.text = `${e.name}: Cyber Essentials ${ce.key === "none" ? "not held" : lc(ce.label)}; Plus ${plus.key === "none" ? "not held" : lc(plus.label)}`;
+        const g = el("div", "wgrade", sd == null ? "–" : sd < 0 ? "!" : sd > 99 ? "✓" : String(sd));
+        g.style.setProperty("--gc", sd == null ? "var(--muted)" : sd <= 30 ? "var(--bad)" : sd <= 60 ? "var(--warn)" : "var(--good)");
+        g.title = sd == null ? "No certificates" : sd < 0 ? "Expired" : `${sd} days until the next expiry`;
+        if (sd != null && sd >= 0 && sd <= 99) g.style.fontSize = "17px";
+        const mid = el("div", "wmid"); mid.append(el("div", "dn", e.name));
+        const meta = el("div", "meta");
+        meta.append(el("span", "pill " + ce.pill, "CE: " + ce.label), el("span", "pill " + plus.pill, "CE+: " + plus.label));
+        mid.append(meta);
+        const nums = [e.ce && e.ce.num ? "CE " + e.ce.num : "", e.plus && e.plus.num ? "CE+ " + e.plus.num : "", e.notes].filter(Boolean).join(" · ");
+        if (nums) mid.append(el("small", "ce-sub", nums));
+        const acts = el("div", "acts");
+        const ver = el("a", "copybtn", "Verify ↗"); ver.href = "https://www.iasme.co.uk/certified-organisations"; ver.target = "_blank"; ver.rel = "noopener"; ver.style.textDecoration = "none";
+        acts.append(ver);
+        if (!isExample) {
+          const ed = el("button", "copybtn", "Edit"); ed.type = "button"; ed.addEventListener("click", () => { editing = e; render(); window.scrollTo({ top: out.offsetTop - 80, behavior: "smooth" }); });
+          const rm = el("button", "copybtn", "Remove"); rm.type = "button"; let armed = false;
+          rm.addEventListener("click", () => { if (!armed) { armed = true; rm.textContent = "Tap again to remove"; setTimeout(() => { armed = false; rm.textContent = "Remove"; }, 3000); return; } save(load().filter(x => x.id !== e.id)); render(); });
+          acts.append(ed, rm);
+        }
+        r.append(g, mid, acts); box.append(r);
+      });
+      pl.append(box); out.append(pl);
+      const pc = panel("Renewals in the next 12 months", "Light blue is Cyber Essentials, dark blue is Plus. The next two months are highlighted."); pc.classList.add("chart"); pc.append(monthsChart(list)); out.append(pc);
+      if (!isExample) {
+        const pb = panel("Back up or move your list", "The list lives on this device. Copy it to keep a backup or to load it on another device.");
+        const row = el("div", "genrow");
+        row.append(copyButton(() => JSON.stringify(load(), null, 1), "Copy list"));
+        const imp = el("button", "copybtn", "Paste a list"); imp.type = "button";
+        const ta = el("textarea"); ta.rows = 4; ta.id = "ce-import"; ta.placeholder = "Paste a copied list here, then tap Load"; ta.hidden = true; ta.style.cssText = "width:100%;font-family:var(--font-mono);font-size:12px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);margin-top:10px";
+        const loadB = el("button", "btnp", "Load"); loadB.type = "button"; loadB.hidden = true;
+        const msg = el("span", "note");
+        imp.addEventListener("click", () => { ta.hidden = !ta.hidden; loadB.hidden = ta.hidden; if (!ta.hidden) ta.focus(); });
+        loadB.addEventListener("click", () => {
+          try { const inc = JSON.parse(ta.value); if (!Array.isArray(inc)) throw 0; const list2 = load(); let n = 0;
+            inc.forEach(x => { if (!x || !x.name) return; const i = list2.findIndex(y => y.id === x.id || y.name.toLowerCase() === String(x.name).toLowerCase()); const rec = { id: x.id || "c" + Math.random().toString(36).slice(2), name: String(x.name), ce: x.ce || null, plus: x.plus || null, notes: x.notes || "", added: x.added || new Date().toISOString() }; if (i >= 0) list2[i] = rec; else list2.push(rec); n++; });
+            save(list2); render(); } catch { msg.textContent = "That isn't a copied list. Use Copy list on the other device first."; }
+        });
+        row.append(imp, loadB, msg); pb.append(row, ta); out.append(pb);
+      }
+      out.append(cta("Need certifying or renewing? Steer IT prepares clients for Cyber Essentials and Cyber Essentials Plus and handles the submission."));
+    }
+    function mount() {
+      const f = searchForm({ id: "ce-add", label: "Client name", placeholder: "Client name", button: "Add client" });
+      dial = buildHero({ eyebrow: "Cyber Essentials tracker", title: 'Who\'s certified, and <span class="hl">when is it due</span>?', lede: "Keep track of each client's Cyber Essentials and Cyber Essentials Plus certificates, see what's due for renewal and verify any certificate on IASME's official register.", form: f.form,
+        fine: [document.createTextNode("Saved on this device only. IASME's register can't be searched automatically, so dates are entered once by you.")] });
+      f.input.autocomplete = "organization";
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const n = f.input.value.trim(); if (!n) { f.input.focus(); return; } editing = { name: n }; f.input.value = ""; render(); });
+      render();
+      foot.replaceChildren(el("div", null, "Cyber Essentials and Cyber Essentials Plus certificates are valid for 12 months from the certification date. Plus must be achieved within three months of the basic certificate. Start renewals around two months before expiry."));
+    }
+    function alerts() { const s = summary(load()); return { urgent: s.urgent.map(x => x.e.name), soon: s.due.map(x => x.e.name) }; }
+    return { mount, alerts };
+  })();
+
+
   // ================= Dashboard =================
   const Home = (() => {
     const ART = {
@@ -2634,12 +3060,18 @@ footer a { color: inherit; }
       builder: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="36" height="32" rx="4"/><path d="M13 17l5 5-5 5M22 29h12"/></svg>',
       blacklist: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="30" height="22" rx="3"/><path d="M6 13l14 10 14-10"/><circle cx="35" cy="33" r="9" fill="#0a3550" stroke="#ff8b77"/><path d="M29 39l12-12" stroke="#ff8b77"/></svg>',
       watch: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 6h22a2 2 0 012 2v34l-13-8-13 8V8a2 2 0 012-2z"/><path d="M18 18l4 4 8-8" stroke="#6fd59c"/></svg>',
-      status: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="38" height="30" rx="4"/><path d="M10 25h7l3-7 6 14 3-7h9"/><circle cx="39" cy="12" r="5" fill="#ff8b77" stroke="#0a3550"/></svg>'
+      status: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="38" height="30" rx="4"/><path d="M10 25h7l3-7 6 14 3-7h9"/><circle cx="39" cy="12" r="5" fill="#ff8b77" stroke="#0a3550"/></svg>',
+      tenant: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="15" height="15" rx="2"/><rect x="26" y="7" width="15" height="15" rx="2"/><rect x="7" y="26" width="15" height="15" rx="2"/><circle cx="33.5" cy="33.5" r="7.5" fill="#0a3550"/><path d="M33.5 30v7M30 33.5h7"/></svg>',
+      headers: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="38" height="28" rx="3"/><path d="M11 18h14M11 24h20M11 30h10"/><circle cx="36" cy="33" r="7" fill="#0a3550" stroke="#f3b75c"/><path d="M41 38l3 3" stroke="#f3b75c"/></svg>',
+      ce: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 4l15 6v11c0 10-6.5 17-15 21-8.5-4-15-11-15-21V10z"/><path d="M17 23l5 5 9-10" stroke="#6fd59c"/></svg>'
     };
     const TOOLS = [
       { id: "report", q: "How does my domain score overall?", title: "Full domain report", text: "Type a domain once to run the email, website, renewal and DNS checks together. You get one grade, a score for each area and the most important fixes first.", tags: ["Overall grade", "Top fixes", "Share"], wide: true },
       { id: "builder", q: "What should my records say?", title: "Record builder", text: "Builds SPF, DMARC, MTA-STS and CAA records from a few simple choices, starting from what the domain has now. Copy and paste into your DNS host.", tags: ["SPF", "DMARC", "MTA-STS", "CAA"] },
       { id: "blacklist", q: "Why are my emails going to junk?", title: "Blacklist check", text: "Checks a domain's mail servers and the domain itself against the main spam blacklists, with removal links if anything is listed.", tags: ["10 blacklists", "Mail servers", "Delisting"] },
+      { id: "tenant", q: "Is it on Microsoft 365?", title: "Microsoft 365 tenant lookup", text: "Finds the tenant ID, name and region behind any domain, how sign-in works, and whether email, DKIM, Teams and Intune records are set up.", tags: ["Tenant ID", "Region", "Federation"] },
+      { id: "headers", q: "Is this email really from them?", title: "Email header analyser", text: "Paste an email's headers to see the real sender, SPF, DKIM and DMARC results, red flags and where delivery was held up.", tags: ["Phishing", "SPF/DKIM/DMARC", "Delays"] },
+      { id: "ce", q: "Who's certified, and when is it due?", title: "Cyber Essentials tracker", text: "Track every client's Cyber Essentials and Plus certificates, see renewals coming up and verify on IASME's register.", tags: ["CE", "CE Plus", "Renewals"] },
       { id: "status", q: "Is it them, or is it us?", title: "Service status", text: "Live status for Microsoft 365, TeamViewer, Cloudflare and other services you choose. Anything with a major outage turns red, here and on the Status tab.", tags: ["Microsoft 365", "TeamViewer", "Cloudflare", "Pick your own"], wide: true },
       { id: "watch", q: "What's changed since last time?", title: "My domains", text: "Save the domains you look after on this device, re-check them in one tap and see grade changes and anything about to expire.", tags: ["Saved list", "Re-check all", "Changes"] },
       { id: "breach", q: "Has my email been leaked?", title: "Breach check", text: "Find out if an email address appears in known data breaches or leaked dumps, what was exposed and when.", tags: ["Breaches", "Paste dumps", "Risk score"] },
@@ -2655,10 +3087,17 @@ footer a { color: inherit; }
       const a1 = el("a", "solid", "Run a full domain report"); a1.href = "#report"; a1.dataset.route = "report";
       const a2 = el("a", "ghost", "Check an email for breaches"); a2.href = "#breach"; a2.dataset.route = "breach";
       ctas.append(a1, a2);
-      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Twelve free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Pick a section below to see its tools.", ctas });
-      dial.set({ value: "12", sub: "FREE TOOLS" });
+      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Fifteen free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Pick a section below to see its tools.", ctas });
+      dial.set({ value: "15", sub: "FREE TOOLS" });
       out.replaceChildren();
       const banner = el("div"); out.append(banner);
+      const ceA = CyberEss.alerts();
+      if (ceA.urgent.length || ceA.soon.length) {
+        const a = el("a", "alert-banner" + (ceA.urgent.length ? "" : " minor")); a.href = "#ce"; a.dataset.route = "ce";
+        const t = el("div"); const names = ceA.urgent.length ? ceA.urgent : ceA.soon;
+        t.append(el("b", null, ceA.urgent.length ? "Cyber Essentials due" : "Cyber Essentials renewals"), el("span", null, names.slice(0, 3).join(", ") + (names.length > 3 ? ` and ${names.length - 3} more` : "")));
+        a.append(t, el("em", null, "See tracker →")); out.append(a);
+      }
       Status.background().then(r => {
         if (current !== "home" || r.worst < 2) return;
         const a = el("a", "alert-banner" + (r.worst >= 3 ? "" : " minor")); a.href = "#status"; a.dataset.route = "status";
@@ -2666,8 +3105,8 @@ footer a { color: inherit; }
         a.append(t, el("em", null, "See service status →")); banner.replaceWith(a);
       }).catch(() => {});
       const SECTIONS = [
-        { id: "domain", title: "Domain and email", blurb: "Grades, email security, DNS records, blacklists and renewals", tools: ["report", "watch", "domain", "builder", "blacklist", "website", "dns", "expiry"], art: "report" },
-        { id: "security", title: "Security", blurb: "Leaked accounts, password strength and a password generator", tools: ["breach", "password"], art: "password" },
+        { id: "domain", title: "Domain and email", blurb: "Grades, Microsoft 365, email security, headers, DNS, blacklists and renewals", tools: ["report", "watch", "tenant", "domain", "headers", "builder", "blacklist", "website", "dns", "expiry"], art: "report" },
+        { id: "security", title: "Security", blurb: "Cyber Essentials renewals, leaked accounts and passwords", tools: ["ce", "breach", "password"], art: "password" },
         { id: "network", title: "Services and network", blurb: "Live outages for the services you use, and internet speed", tools: ["status", "speed"], art: "status" }
       ];
       let open = null; try { open = localStorage.getItem("steer-toolkit-section"); } catch {}
@@ -2705,7 +3144,7 @@ footer a { color: inherit; }
   })();
 
   // ================= Router =================
-  const ROUTES = { home: Home, report: Report, breach: Breach, domain: Domain, password: Password, website: Website, dns: Dns, expiry: Expiry, speed: Speed, builder: Builder, blacklist: Blacklist, watch: Watch, status: Status };
+  const ROUTES = { home: Home, report: Report, breach: Breach, domain: Domain, password: Password, website: Website, dns: Dns, expiry: Expiry, speed: Speed, builder: Builder, blacklist: Blacklist, watch: Watch, status: Status, tenant: Tenant, headers: Headers, ce: CyberEss };
   function go(route, push) {
     if (!ROUTES[route]) route = "home";
     if (route === current) return;
