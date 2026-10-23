@@ -311,6 +311,18 @@ table.rtable { width: 100%; border-collapse: collapse; font-size: 13px; }
 .chipbtn { font: inherit; font-size: 12.5px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
 .chipbtn i { width: 8px; height: 8px; border-radius: 50%; }
 .chipbtn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+@media (max-width: 700px) {
+  .rtable-wrap { overflow-x: visible; }
+  .rtable thead { display: none; }
+  .rtable, .rtable tbody { display: block; }
+  .rtable tr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 6px 10px; padding: 11px 12px; border-top: 1px solid var(--line); }
+  .rtable tr:first-child { border-top: 0; }
+  .rtable td { display: block; padding: 0; border: 0; }
+  .rtable td.n { white-space: normal; overflow-wrap: anywhere; font-weight: 500; }
+  .rtable td.v { grid-column: 1 / -1; min-width: 0; background: var(--bg); border-radius: 6px; padding: 7px 9px; font-size: 12px; }
+  .rtable td[colspan] { grid-column: 1 / -1; }
+  .toolbar .spacer { display: none; }
+}
 .btn2 { font: inherit; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--accent); cursor: pointer; }
 
 footer .inner { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-block: 18px 40px; display: flex; flex-direction: column; gap: 6px; }
