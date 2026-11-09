@@ -497,6 +497,24 @@ ol.hops .t i { display: block; height: 100%; border-radius: inherit; }
 .goodnote { color: var(--good); }
 .ce-sub { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); font-family: var(--font-mono); overflow-wrap: anywhere; }
 
+/* QR check */
+.qr-box { display: flex; flex-direction: column; gap: 10px; }
+.qr-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.qr-actions .ghostbtn { cursor: pointer; }
+form.search.qr-paste { padding: 6px; }
+form.search.qr-paste .field input { padding: 11px 14px; font-size: 14px; }
+form.search.qr-paste button.primary { padding: 11px 18px; background: rgba(255,255,255,.14); color: #ffffff; }
+.qr-stage { position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 3 / 4; max-width: 420px; max-height: 70vh; width: 100%; margin: 4px auto 14px; }
+.qr-stage video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qr-frame { position: absolute; inset: 18% 14%; border: 3px solid var(--steer-cyan); border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,.35); }
+.qr-cam-wrap { display: flex; flex-direction: column; align-items: center; }
+.qr-link { display: flex; flex-direction: column; gap: 12px; }
+.qr-dom { font-size: 15px; }
+.qr-dom b { font-family: var(--font-mono); font-size: 16px; overflow-wrap: anywhere; }
+.qr-link code { font-family: var(--font-mono); font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-wrap: anywhere; word-break: break-all; white-space: pre-wrap; }
+.qr-link mark { background: color-mix(in srgb, var(--steer-cyan) 30%, transparent); color: var(--ink); border-radius: 3px; padding: 0 1px; font-weight: 600; }
+.copybtn.danger { color: #ffffff; background: var(--bad); border-color: var(--bad); }
+
 footer .inner { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-block: 18px 40px; display: flex; flex-direction: column; gap: 6px; }
 footer a { color: inherit; }
 @media (prefers-reduced-motion: reduce) { .dial .sweep, .spinner { animation-duration: 6s; } .bar-row .t i, .tool-card { transition: none; } }
@@ -514,6 +532,7 @@ footer a { color: inherit; }
       <a href="#report" data-route="report">Full report</a>
       <a href="#watch" data-route="watch">My domains</a>
       <a href="#status" data-route="status">Service status</a>
+      <a href="#qr" data-route="qr">QR check</a>
       <a href="#breach" data-route="breach">Breach check</a>
       <a href="#domain" data-route="domain">Email security</a>
       <a href="#password" data-route="password">Password check</a>
@@ -616,7 +635,7 @@ footer a { color: inherit; }
 
   let PREFILL = null;   // { route, value } handed from the full report to a tool
   let current = null;
-  const TITLES = { home: "Security Toolkit", report: "Full domain report", breach: "Breach check", domain: "Email security check", password: "Password check", website: "Website scan", dns: "DNS lookup", expiry: "Domain and certificate expiry", speed: "Speed test", builder: "DNS record builder", blacklist: "Blacklist check", watch: "My domains", status: "Service status", tenant: "Microsoft 365 tenant lookup", headers: "Email header analyser", ce: "Cyber Essentials tracker" };
+  const TITLES = { home: "Security Toolkit", report: "Full domain report", breach: "Breach check", domain: "Email security check", password: "Password check", website: "Website scan", dns: "DNS lookup", expiry: "Domain and certificate expiry", speed: "Speed test", builder: "DNS record builder", blacklist: "Blacklist check", watch: "My domains", status: "Service status", tenant: "Microsoft 365 tenant lookup", headers: "Email header analyser", ce: "Cyber Essentials tracker", qr: "QR code check" };
   function takePrefill(route) { if (PREFILL && PREFILL.route === route) { const v = PREFILL.value; PREFILL = null; return v; } return null; }
 
   // Plain-text summary of whatever result is on screen, for the share sheet
@@ -1860,7 +1879,7 @@ footer a { color: inherit; }
       foot.replaceChildren(el("div", null, "Registration data from RDAP, the registries' public lookup service (Nominet for .uk). Certificate dates come from public certificate logs and show the newest valid certificate issued, which is almost always the one in use."));
       const pre = takePrefill("expiry"); if (pre) { f.input.value = pre; run(pre, f.button); }
     }
-    return { mount, fetchData, score, issues, SAMPLE, daysUntil };
+    return { mount, fetchData, score, issues, SAMPLE, daysUntil, rdap };
   })();
 
   // ================= Tool: Full domain report =================
@@ -3124,10 +3143,280 @@ X-MS-Exchange-Organization-SCL: 5`;
   })();
 
 
+  // ================= Tool: QR code check =================
+  const QR = (() => {
+    const JSQR_URL = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+    let dial, stream = null, raf = 0, libP = null, busy = false;
+    const SHORTENERS = ["bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "is.gd", "buff.ly", "rebrand.ly", "cutt.ly", "shorturl.at", "tiny.cc", "rb.gy", "bl.ink", "short.io", "qrco.de", "qr.page", "qrfy.io", "linktr.ee", "s.id", "t.ly", "lnkd.in", "trib.al", "v.gd", "shorturl.com", "urlz.fr", "me-qr.com", "qr-code-generator.com", "q-r.to"];
+    const RISKY_TLDS = ["zip", "mov", "xyz", "top", "click", "quest", "cfd", "sbs", "rest", "icu", "buzz", "lol", "cyou", "monster", "support", "live", "online", "site", "shop", "info", "work", "fit", "gq", "tk", "ml", "cf", "ga", "su", "ru", "cn"];
+    // brand → its genuine registrable domains
+    const BRANDS = {
+      microsoft: ["microsoft.com", "microsoftonline.com", "live.com", "office.com", "office365.com", "outlook.com", "sharepoint.com", "onedrive.com", "cloud.microsoft", "microsoft365.com", "aka.ms", "msft.it"],
+      office: ["office.com", "office365.com", "microsoft.com", "microsoft365.com"], outlook: ["outlook.com", "live.com", "office.com", "microsoft.com"],
+      onedrive: ["onedrive.com", "live.com", "microsoft.com", "sharepoint.com"], sharepoint: ["sharepoint.com", "microsoft.com"],
+      apple: ["apple.com", "icloud.com", "apple.co"], icloud: ["icloud.com", "apple.com"], google: ["google.com", "google.co.uk", "goo.gl", "g.co", "youtube.com"],
+      paypal: ["paypal.com", "paypal.me", "paypal.co.uk"], amazon: ["amazon.co.uk", "amazon.com", "amzn.to", "amzn.eu", "amazon.de"],
+      hmrc: ["gov.uk", "tax.service.gov.uk"], govuk: ["gov.uk"], dvla: ["gov.uk"], nhs: ["nhs.uk"], royalmail: ["royalmail.com"], evri: ["evri.com"], dpd: ["dpd.co.uk", "dpdlocal.co.uk"], dhl: ["dhl.com", "dhl.co.uk"], parcelforce: ["parcelforce.com"],
+      barclays: ["barclays.co.uk", "barclays.com"], hsbc: ["hsbc.co.uk", "hsbc.com"], lloyds: ["lloydsbank.com", "lloydsbank.co.uk"], natwest: ["natwest.com"], santander: ["santander.co.uk"], nationwide: ["nationwide.co.uk"], monzo: ["monzo.com", "monzo.me"], starling: ["starlingbank.com"], halifax: ["halifax.co.uk"],
+      docusign: ["docusign.com", "docusign.net"], adobe: ["adobe.com"], dropbox: ["dropbox.com"], wetransfer: ["wetransfer.com", "we.tl"], netflix: ["netflix.com"], facebook: ["facebook.com", "fb.com", "fb.me"], instagram: ["instagram.com"], linkedin: ["linkedin.com", "lnkd.in"], whatsapp: ["whatsapp.com", "wa.me"],
+      xero: ["xero.com"], ringgo: ["ringgo.co.uk", "myringgo.co.uk"], paybyphone: ["paybyphone.co.uk", "paybyphone.com"], justpark: ["justpark.com"], evcharge: []
+    };
+    const BRAND_NAMES = { microsoft: "Microsoft", office: "Microsoft Office", outlook: "Outlook", onedrive: "OneDrive", sharepoint: "SharePoint", apple: "Apple", icloud: "iCloud", google: "Google", paypal: "PayPal", amazon: "Amazon", hmrc: "HMRC", govuk: "GOV.UK", dvla: "DVLA", nhs: "the NHS", royalmail: "Royal Mail", evri: "Evri", dpd: "DPD", dhl: "DHL", parcelforce: "Parcelforce", barclays: "Barclays", hsbc: "HSBC", lloyds: "Lloyds", natwest: "NatWest", santander: "Santander", nationwide: "Nationwide", monzo: "Monzo", starling: "Starling", halifax: "Halifax", docusign: "DocuSign", adobe: "Adobe", dropbox: "Dropbox", wetransfer: "WeTransfer", netflix: "Netflix", facebook: "Facebook", instagram: "Instagram", linkedin: "LinkedIn", whatsapp: "WhatsApp", xero: "Xero", ringgo: "RingGo", paybyphone: "PayByPhone", justpark: "JustPark" };
+    const SECOND_LEVEL = /\.(co|org|ac|gov|ltd|plc|me|net|sch|nhs|police|mod|com|edu)\.(uk|au|nz|za|in|jp|kr|br|mx|tr|cn|hk|sg|my|id|ph|th|vn|ar|co)$/;
+    const regDomain = (host) => { host = host.replace(/^www\./, ""); const p = host.split("."); return p.slice(SECOND_LEVEL.test(host) && p.length > 2 ? -3 : -2).join("."); };
+    const unleet = (s) => s.replace(/0/g, "o").replace(/[1l|]/g, "l").replace(/3/g, "e").replace(/4|@/g, "a").replace(/5|\$/g, "s").replace(/7/g, "t").replace(/rn/g, "m").replace(/vv/g, "w");
+    function lev(a, b) {
+      const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+      for (let j = 1; j <= b.length; j++) d[0][j] = j;
+      for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      return d[a.length][b.length];
+    }
+    const isOfficial = (brand, reg, host) => (BRANDS[brand] || []).some(d => reg === d || host === d || host.endsWith("." + d));
+
+    // ---------- What's in the code ----------
+    function classify(raw) {
+      const t = String(raw || "").trim();
+      if (/^WIFI:/i.test(t)) {
+        const f = (k) => { const m = t.match(new RegExp("[:;]" + k + ":((?:\\\\.|[^;])*)", "i")); return m ? m[1].replace(/\\(.)/g, "$1") : ""; };
+        return { kind: "wifi", ssid: f("S"), auth: (f("T") || "nopass").toUpperCase(), password: f("P"), hidden: /true/i.test(f("H")) };
+      }
+      if (/^(SMSTO|SMS):/i.test(t)) { const p = t.replace(/^(SMSTO|SMS):/i, "").split(":"); return { kind: "sms", number: p[0].split("?")[0], body: p.slice(1).join(":") || decodeURIComponent((t.match(/body=([^&]*)/i) || [])[1] || "") }; }
+      if (/^tel:/i.test(t)) return { kind: "tel", number: t.slice(4) };
+      if (/^mailto:/i.test(t) || /^MATMSG:/i.test(t)) {
+        if (/^MATMSG:/i.test(t)) return { kind: "email", to: (t.match(/TO:([^;]*)/i) || [])[1] || "", subject: (t.match(/SUB:([^;]*)/i) || [])[1] || "" };
+        const u = t.slice(7); return { kind: "email", to: decodeURIComponent(u.split("?")[0]), subject: decodeURIComponent((u.match(/subject=([^&]*)/i) || [])[1] || "") };
+      }
+      if (/^BEGIN:VCARD/i.test(t)) return { kind: "vcard", name: ((t.match(/\nFN[^:]*:([^\r\n]*)/i) || [])[1] || "").trim(), text: t };
+      if (/^BEGIN:VEVENT|^BEGIN:VCALENDAR/i.test(t)) return { kind: "event", title: ((t.match(/\nSUMMARY[^:]*:([^\r\n]*)/i) || [])[1] || "").trim(), text: t };
+      if (/^geo:/i.test(t)) return { kind: "geo", text: t };
+      if (/^(javascript|data|vbscript|file):/i.test(t)) return { kind: "script", text: t };
+      let s = t, bare = false;
+      if (!/\s/.test(s) && (/^www\.[^\s]+\.[a-z]{2,}/i.test(s) || /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/|$)/i.test(s))) { s = "https://" + s; bare = true; }
+      if (/^https?:\/\//i.test(s)) { try { return { kind: "url", url: new URL(s), raw: t, bare }; } catch {} }
+      if (/^[a-z][a-z0-9+.-]{1,30}:/i.test(t) && !/\s/.test(t.split(":")[0])) return { kind: "app", scheme: t.split(":")[0], text: t };
+      return { kind: "text", text: t };
+    }
+
+    // ---------- Offline checks on a web link ----------
+    function urlChecks(u, bare) {
+      const host = u.hostname.toLowerCase().replace(/\.$/, ""), reg = regDomain(host), label = reg.split(".")[0], tld = host.split(".").pop();
+      const full = u.href.toLowerCase(), pathq = (u.pathname + u.search + u.hash).toLowerCase();
+      const out = []; let brandHit = null;
+      const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.startsWith("[");
+      if (u.username || u.password) out.push({ status: "fail", name: "Hidden destination trick", what: `Everything before the “@” is ignored. This link really goes to ${host}.` });
+      if (isIp) out.push({ status: "fail", name: "Uses a bare IP address", what: `It goes to ${host} rather than a named website. Genuine businesses almost never do this.` });
+      if (/(^|\.)xn--/.test(host)) out.push({ status: "fail", name: "Look-alike characters in the address", what: "The address uses international characters, which can imitate a real brand letter for letter." });
+      if (bare) out.push({ status: "info", name: "Address without http or https", what: "The code just contains a web address. Your phone will open it as a normal website.", label: "Note" });
+      if (u.protocol === "http:") out.push({ status: "warn", name: "Not encrypted (no HTTPS)", what: "Anything typed on this page can be read in transit. Never enter passwords or card details on it." });
+      if (u.port && !["80", "443"].includes(u.port)) out.push({ status: "warn", name: `Unusual port (${u.port})`, what: "Normal websites don't need a port number in the address." });
+      if (!isIp) {
+        for (const b of Object.keys(BRANDS)) {
+          const inHost = host.replace(/[-.]/g, " ").split(" ").some(p => p.includes(b)) || host.includes(b);
+          const inPath = new RegExp("(^|[^a-z])" + b + "([^a-z]|$)").test(pathq) && /login|log-in|signin|sign-in|verify|password|account|payment|billing|secure|unlock|suspend|refund/.test(pathq);
+          if ((inHost || inPath) && !isOfficial(b, reg, host) && b !== "evcharge") { brandHit = b; out.push({ status: inHost ? "fail" : "warn", name: `Mentions ${BRAND_NAMES[b]}, but isn't ${BRAND_NAMES[b]}`, what: `The real owner is ${reg}. ${inHost ? "Brand names in the address are a common disguise." : "The brand name appears in the link but the site belongs to someone else."}` }); break; }
+          const ul = unleet(label);
+          if (!inHost && b.length >= 5 && ul !== label && ul.includes(b) && !isOfficial(b, reg, host)) { brandHit = b; out.push({ status: "fail", name: `Look-alike of ${BRAND_NAMES[b]}`, what: `“${reg}” swaps letters for numbers or symbols to look like ${BRAND_NAMES[b]}. It isn't their website.` }); break; }
+          if (!inHost && b.length >= 5 && label !== b && !isOfficial(b, reg, host) && (ul === b || (lev(ul, b) <= (b.length >= 8 ? 2 : 1) && Math.abs(ul.length - b.length) <= 2))) { brandHit = b; out.push({ status: "fail", name: `Look-alike of ${BRAND_NAMES[b]}`, what: `“${reg}” is spelt to look like ${BRAND_NAMES[b]}, but it isn't their website.` }); break; }
+        }
+      }
+      if (SHORTENERS.some(s => host === s || host.endsWith("." + s))) out.push({ status: "warn", name: "Shortened link", what: `${host} hides the final destination, so it can't be checked from here. Be wary of shortened links on posters, parking meters and letters.` });
+      if (!isIp && RISKY_TLDS.includes(tld)) out.push({ status: "warn", name: `.${tld} address`, what: `Cheap .${tld} domains are heavily used for scam sites. Not proof on its own.` });
+      if (!isIp && host.split(".").length - reg.split(".").length >= 3) out.push({ status: "warn", name: "Unusually long web address", what: `${host} has many parts, a common way to bury the real owner (${reg}) at the end.` });
+      if (/[?&](url|u|redirect|redirect_uri|redir|next|target|dest|destination|continue|goto|return|returnurl)=(https?|%2f%2f|https?%3a)/i.test(u.search)) out.push({ status: "warn", name: "Bounces to another site", what: "The link passes you on to a different address, a common way to hide where it really ends up." });
+      const words = (pathq.match(/login|log-in|signin|sign-in|verify|verification|account|password|passcode|payment|pay|invoice|billing|secure|update|unlock|suspend|wallet|refund|reward|prize|parking|fine|penalty|delivery|parcel|redeliver|mfa|2fa|otp/g) || []);
+      const uniq = [...new Set(words)];
+      if (uniq.length) out.push({ status: (brandHit || out.some(x => x.status !== "info")) && uniq.length ? "warn" : "info", name: "Asks you to sign in or pay", what: `The link mentions ${uniq.slice(0, 4).join(", ")}. Scam QR codes usually lead to fake login, parking or payment pages.` });
+      if (/\.(apk|exe|msi|dmg|zip|rar|7z|scr|bat|js|iso|img|mobileconfig|ipa)(\?|#|$)/i.test(u.pathname)) out.push({ status: "fail", name: "Downloads a file", what: "This link downloads a file or app rather than opening a web page. Don't install anything from a QR code." });
+      if (full.length > 200) out.push({ status: "info", name: "Very long link", what: "Long links often carry tracking or your email address. Not dangerous on its own." });
+      return { host, reg, out, isIp };
+    }
+
+    // ---------- Live checks: does it exist, how old is it ----------
+    async function liveChecks(c) {
+      if (c.isIp) return [];
+      const res = [];
+      const [a, reg] = await Promise.all([dns(c.host, "A").catch(() => null), Expiry.rdap(c.reg).catch(() => null)]);
+      if (a && a.Status === 3) res.push({ status: "fail", name: "Website doesn't exist", what: `${c.host} has no DNS records. The link is broken or the site has been taken down.` });
+      if (reg && !reg.notFound && reg.registered) {
+        const days = Math.floor((Date.now() - new Date(reg.registered)) / 864e5);
+        const when = new Date(reg.registered).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        res.age = days;
+        if (days < 30) res.push({ status: "fail", name: `Registered ${days} day${days === 1 ? "" : "s"} ago`, what: `${c.reg} was registered on ${when}. Most scam sites are only days or weeks old.` });
+        else if (days < 180) res.push({ status: "warn", name: `Registered ${Math.round(days / 30)} months ago`, what: `${c.reg} is fairly new (${when}). Take extra care if it asks you to sign in or pay.` });
+        else res.push({ status: "pass", name: `Established domain (${days >= 730 ? Math.floor(days / 365) + " years" : Math.round(days / 30) + " months"} old)`, what: `${c.reg} was registered on ${when}${reg.registrar ? " with " + reg.registrar : ""}.` });
+      } else if (reg && reg.notFound) res.push({ status: "fail", name: "Domain isn't registered", what: `Nobody owns ${c.reg}. The link can't lead anywhere genuine.` });
+      else res.push({ status: "info", name: "Couldn't check the domain's age", what: "The domain registry didn't answer. Treat an unfamiliar address with care.", label: "Unknown" });
+      return res;
+    }
+
+    // ---------- Render ----------
+    function verdictOf(checks) { return checks.some(c => c.status === "fail") ? "bad" : checks.some(c => c.status === "warn") ? "warn" : "good"; }
+    function linkBox(c, u, st) {
+      const p = panel("Where it really goes", "The link hasn't been opened.");
+      const box = el("div", "qr-link");
+      const domLine = el("div", "qr-dom"); domLine.append(el("span", null, "Website owner: "), el("b", null, c.reg)); box.append(domLine);
+      const code = el("code"); const href = u.href;
+      const i = href.toLowerCase().indexOf(c.reg, href.toLowerCase().indexOf("//") + 2);
+      if (i > 0) { code.append(document.createTextNode(href.slice(0, i))); code.append(el("mark", null, href.slice(i, i + c.reg.length))); code.append(document.createTextNode(href.slice(i + c.reg.length))); }
+      else code.textContent = href;
+      box.append(code);
+      const acts = el("div", "genrow");
+      acts.append(copyButton(href, "Copy link"));
+      const open = el("a", "copybtn", st === "bad" ? "Open anyway" : "Open link ↗"); open.href = href; open.target = "_blank"; open.rel = "noopener noreferrer"; open.style.textDecoration = "none";
+      if (st === "bad") { let armed = false; open.addEventListener("click", (e) => { if (!armed) { e.preventDefault(); armed = true; open.textContent = "Tap again: I understand the risk"; open.classList.add("danger"); setTimeout(() => { armed = false; open.textContent = "Open anyway"; open.classList.remove("danger"); }, 4000); } }); }
+      acts.append(open);
+      if (!c.isIp) { const rep = el("button", "copybtn", "Full domain report →"); rep.type = "button"; rep.addEventListener("click", () => { PREFILL = { route: "report", value: c.reg }; go("report", true); }); acts.append(rep); }
+      box.append(acts); p.append(box); return p;
+    }
+    async function render(raw, isExample, sampleLive) {
+      out.replaceChildren();
+      const c = classify(raw);
+      let checks = [], title = "", body = "", tag = "", extraPanels = [];
+      if (c.kind === "url") {
+        const u = c.url, uc = urlChecks(u, c.bare);
+        loading(`Checking ${uc.reg}…`); dial.set({ scanning: true });
+        const live = sampleLive || (isExample ? [] : await liveChecks(uc));
+        if (current !== "qr") return;
+        out.replaceChildren();
+        checks = uc.out.concat(live);
+        const st = verdictOf(checks);
+        tag = st === "bad" ? "Don't open" : st === "warn" ? "Be careful" : "No warning signs";
+        title = st === "bad" ? `This QR code looks like a scam` : st === "warn" ? `Check before you open this link` : `Goes to ${uc.reg}`;
+        body = st === "bad" ? `It leads to ${uc.reg}. Don't enter passwords, card details or personal information. If you need the service, type its address yourself or use its app.` :
+          st === "warn" ? `It leads to ${uc.reg}. Make sure that's who you expect, especially before signing in or paying.` :
+          `Nothing suspicious found. Make sure ${uc.reg} is who you expect: a clean result can't guarantee a page is genuine.`;
+        dial.set({ value: st === "bad" ? "STOP" : st === "warn" ? "CHECK" : "OK", sub: "QR VERDICT", colour: st === "bad" ? "#ff8b77" : st === "warn" ? "#f3b75c" : "#6fd59c", blips: checks.filter(x => x.status === "fail").length });
+        out.append(verdict(st, tag, title, body, isExample));
+        out.append(linkBox(uc, u, st));
+      } else {
+        const ex = {
+          wifi: () => { const open = c.auth === "NOPASS" || !c.password; checks = [{ status: open ? "warn" : c.auth === "WEP" ? "warn" : "pass", name: open ? "Open network, no password" : c.auth === "WEP" ? "Old WEP security" : "Password-protected network", what: open ? "Anyone nearby can see unencrypted traffic. Use a VPN or mobile data for anything sensitive." : c.auth === "WEP" ? "WEP can be cracked in minutes." : `Secured with ${c.auth}.` }, { status: "info", name: "Check it's the real network", what: "Fake hotspots copy the names of cafés and hotels. Ask staff for the exact network name.", label: "Tip" }]; title = `Joins the Wi-Fi network “${c.ssid || "unnamed"}”`; body = "Scanning this in the Camera app offers to join the network automatically."; const p = panel("Network details"); const dl = el("dl", "kv"); [["Network name", c.ssid || "—"], ["Security", c.auth === "NOPASS" ? "None" : c.auth], ["Password", c.password || "—"], ["Hidden network", c.hidden ? "Yes" : "No"]].forEach(([k, v]) => { dl.append(el("dt", null, k), el("dd", null, v)); }); p.append(dl); extraPanels.push(p); },
+          sms: () => { const prem = /^(\+?44)?0?(9|87|84|70)/.test(c.number.replace(/\s/g, "")) || /^\d{5}$/.test(c.number); checks = [{ status: prem ? "fail" : "warn", name: prem ? "Premium-rate or short code number" : "Sends a text message", what: prem ? "Texting this number may be charged at a premium rate or sign you up to a paid service." : "The message is pre-written. Read it before sending." }]; title = `Sends a text to ${c.number}`; body = c.body ? `Pre-written message: “${c.body}”` : "No message text is included."; },
+          tel: () => { const prem = /^(\+?44)?0?(9|87|84|70)/.test(c.number.replace(/\s/g, "")); checks = [{ status: prem ? "fail" : "info", name: prem ? "Premium-rate number" : "Calls a phone number", what: prem ? "Calls to 09, 087, 084 and 070 numbers can be very expensive, and 070 numbers are often used by scammers." : "Check the number matches the organisation's official contact details.", label: prem ? undefined : "Note" }]; title = `Calls ${c.number}`; body = "Your phone will offer to call this number."; },
+          email: () => { checks = [{ status: "info", name: "Writes an email", what: `Opens a new email to ${c.to}${c.subject ? " with the subject “" + c.subject + "”" : ""}. Nothing is sent until you press Send.`, label: "Note" }]; title = `Emails ${c.to}`; body = "Check the address belongs to who you expect."; },
+          vcard: () => { checks = [{ status: "info", name: "Adds a contact", what: "Saving it is harmless, but scammers sometimes use contact cards to make their number look official.", label: "Note" }]; title = `Contact card${c.name ? " for " + c.name : ""}`; body = "Saves a name and contact details to your phone."; },
+          event: () => { checks = [{ status: "info", name: "Adds a calendar event", what: "Check any links inside the event before opening them.", label: "Note" }]; title = `Calendar event${c.title ? ": " + c.title : ""}`; body = "Adds an event to your calendar."; },
+          geo: () => { checks = [{ status: "pass", name: "Opens a map location", what: "Shows a place in your maps app." }]; title = "Shows a location on a map"; body = c.text; },
+          script: () => { checks = [{ status: "fail", name: "Runs code", what: "This QR code tries to run code or open a file directly. There's no legitimate reason for that." }]; title = "This QR code tries to run code"; body = "Don't open it."; },
+          app: () => { checks = [{ status: "warn", name: `Opens an app (${c.scheme}:)`, what: "It hands information to an app on your phone. Only continue if you know which app and why." }]; title = `Opens an app using “${c.scheme}:”`; body = "Not a web link."; },
+          text: () => { const hasLink = /https?:\/\/|www\./i.test(c.text); checks = [{ status: hasLink ? "warn" : "pass", name: hasLink ? "Text containing a link" : "Plain text only", what: hasLink ? "The text includes a web address. Copy it into the box above to check it." : "Just text. It can't open anything on its own." }]; title = "Contains text, not a link"; body = c.text.length > 160 ? c.text.slice(0, 157) + "…" : c.text; }
+        };
+        ex[c.kind]();
+        const st = verdictOf(checks);
+        tag = st === "bad" ? "Don't use" : st === "warn" ? "Be careful" : "No warning signs";
+        dial.set({ value: st === "bad" ? "STOP" : st === "warn" ? "CHECK" : "OK", sub: "QR VERDICT", colour: st === "bad" ? "#ff8b77" : st === "warn" ? "#f3b75c" : "#6fd59c" });
+        out.append(verdict(st, tag, title, body, isExample));
+        if (c.kind !== "wifi") { const pr = panel("What the code contains"); const box = el("div", "qr-link"); box.append(el("code", null, String(raw).slice(0, 600))); const r = el("div", "genrow"); r.append(copyButton(String(raw), "Copy")); box.append(r); pr.append(box); extraPanels.push(pr); }
+      }
+      extraPanels.forEach(p => out.append(p));
+      const order = { fail: 0, warn: 1, info: 2, pass: 3 };
+      const pc = panel("What we checked", "Most serious first.");
+      pc.append(checkList(checks.length ? checks.slice().sort((a, b) => order[a.status] - order[b.status]) : [{ status: "pass", name: "No warning signs", what: "Nothing unusual in the link." }]));
+      out.append(pc);
+      out.append(stepsPanel("Staying safe with QR codes", "Share these with your team.", [
+        ["Check for stickers", "on parking meters, posters and menus. Scammers stick their own codes over the real ones."],
+        ["Be wary of QR codes in emails", "they're used to dodge email filters. Microsoft and banks don't ask you to scan codes to sign in."],
+        ["Type it yourself", "for payments and logins, go to the official website or app rather than following a code."],
+        ["If you entered details", "change that password straight away and tell your IT team."]
+      ]));
+      out.append(cta("Worried about QR phishing reaching your staff? Steer IT can run awareness training and tighten your email filtering."));
+    }
+
+    // ---------- Scanning ----------
+    function loadLib() {
+      if (window.jsQR) return Promise.resolve(window.jsQR);
+      if (!libP) libP = new Promise((res, rej) => { const s = document.createElement("script"); s.src = JSQR_URL; s.async = true; s.onload = () => window.jsQR ? res(window.jsQR) : rej(new Error("jsQR")); s.onerror = () => { libP = null; rej(new Error("load")); }; document.head.append(s); });
+      return libP;
+    }
+    async function decodeCanvas(ctx, w, h) {
+      if ("BarcodeDetector" in window) { try { const d = new window.BarcodeDetector({ formats: ["qr_code"] }); const r = await d.detect(ctx.canvas); if (r && r[0] && r[0].rawValue) return r[0].rawValue; } catch {} }
+      const jsQR = await loadLib();
+      const img = ctx.getImageData(0, 0, w, h);
+      const r = jsQR(img.data, w, h, { inversionAttempts: "attemptBoth" });
+      return r && r.data ? r.data : null;
+    }
+    function stopCam() { cancelAnimationFrame(raf); raf = 0; if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } const v = document.getElementById("qr-cam"); if (v) v.closest(".qr-cam-wrap").remove(); }
+    async function startCam(btn) {
+      if (stream) return;
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { errorBox("The camera isn't available here", "Use Upload a photo instead, or take a screenshot of the QR code and upload that."); return; }
+      try { await loadLib(); } catch { errorBox("The scanner couldn't load", "Check your connection, or paste the link into the box instead."); return; }
+      try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } }, audio: false }); }
+      catch (e) { stream = null; errorBox("The camera couldn't start", e && e.name === "NotAllowedError" ? "Camera access was refused. Allow it in Settings → Safari → Camera (or for this app), or use Upload a photo instead." : "Use Upload a photo instead, or take a screenshot of the QR code and upload that."); return; }
+      out.replaceChildren();
+      const wrap = el("div", "qr-cam-wrap panel");
+      const v = el("video"); v.id = "qr-cam"; v.setAttribute("playsinline", ""); v.muted = true; v.srcObject = stream;
+      const frame = el("div", "qr-frame"); frame.setAttribute("aria-hidden", "true");
+      const stage = el("div", "qr-stage"); stage.append(v, frame);
+      const stop = el("button", "copybtn", "Stop scanning"); stop.type = "button"; stop.addEventListener("click", stopCam);
+      wrap.append(el("p", "hint", "Point the camera at the QR code. Nothing is opened."), stage, stop);
+      out.append(wrap); wrap.scrollIntoView({ behavior: "smooth", block: "center" });
+      dial.set({ scanning: true });
+      try { await v.play(); } catch {}
+      const cv = document.createElement("canvas"), ctx = cv.getContext("2d", { willReadFrequently: true });
+      let last = 0;
+      const tick = async (t) => {
+        if (!stream) return;
+        if (current !== "qr") { stopCam(); return; }
+        if (t - last > 180 && v.readyState >= 2 && v.videoWidth) {
+          last = t;
+          const scale = Math.min(1, 720 / v.videoWidth); cv.width = Math.round(v.videoWidth * scale); cv.height = Math.round(v.videoHeight * scale);
+          ctx.drawImage(v, 0, 0, cv.width, cv.height);
+          const data = await decodeCanvas(ctx, cv.width, cv.height).catch(() => null);
+          if (data && stream) { stopCam(); try { navigator.vibrate && navigator.vibrate(60); } catch {} render(data, false); return; }
+        }
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+    async function fromFile(file) {
+      if (!file) return;
+      loading("Reading the QR code…"); dial.set({ scanning: true });
+      try {
+        const url = URL.createObjectURL(file);
+        const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+        let found = null;
+        for (const max of [1600, 1000, 2400, 600]) {
+          const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+          const cv = document.createElement("canvas"); cv.width = Math.round(img.naturalWidth * s); cv.height = Math.round(img.naturalHeight * s);
+          const ctx = cv.getContext("2d", { willReadFrequently: true }); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height);
+          found = await decodeCanvas(ctx, cv.width, cv.height);
+          if (found) break;
+        }
+        URL.revokeObjectURL(url);
+        if (!found) { dial.set(); return errorBox("No QR code found in that picture", "Crop closer to the code, make sure it's in focus and well lit, then try again."); }
+        render(found, false);
+      } catch (e) { dial.set(); errorBox("Couldn't read that picture", String(e && e.message) === "load" || String(e && e.message) === "jsQR" ? "The scanner couldn't load. Check your connection, or paste the link into the box instead." : "Try a different photo or a screenshot of the QR code."); }
+    }
+    const SAMPLE = "https://microsoft365.login-verify.co/secure/auth?ref=parking-fine&user=you%40company.co.uk";
+    const SAMPLE_LIVE = [{ status: "fail", name: "Registered 4 days ago", what: "login-verify.co was registered 4 days ago. Most scam sites are only days or weeks old." }];
+    function mount() {
+      const wrap = el("div", "qr-actions");
+      const camB = el("button", "primary", "Scan with camera"); camB.type = "button"; camB.addEventListener("click", () => startCam(camB));
+      const fileIn = el("input"); fileIn.type = "file"; fileIn.accept = "image/*"; fileIn.id = "qr-file"; fileIn.className = "sr";
+      fileIn.addEventListener("change", () => { const f = fileIn.files && fileIn.files[0]; fileIn.value = ""; stopCam(); fromFile(f); });
+      const fileL = el("label", "ghostbtn", "Upload a photo"); fileL.htmlFor = "qr-file"; fileL.tabIndex = 0; fileL.setAttribute("role", "button");
+      fileL.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileIn.click(); } });
+      wrap.append(camB, fileL, fileIn);
+      const f = searchForm({ id: "qr-paste", label: "Or paste a link to check", placeholder: "…or paste a link or QR text", button: "Check", inputmode: "url" });
+      f.form.classList.add("qr-paste");
+      f.form.addEventListener("submit", (e) => { e.preventDefault(); const v = f.input.value.trim(); if (!v) { f.input.focus(); return; } stopCam(); render(v, false); });
+      const box = el("div", "qr-box"); box.append(wrap, f.form);
+      dial = buildHero({ eyebrow: "QR code check", title: 'Scan it here <span class="hl">before you tap it</span>.', lede: "Shows where a QR code really leads and flags the warning signs of QR phishing (“quishing”), without opening the link. Works with the camera, a photo or a screenshot.", form: box,
+        fine: [document.createTextNode("The link is never opened. Only its domain name is looked up. "), exLink("See an example result", () => { stopCam(); render(SAMPLE, true, SAMPLE_LIVE); })] });
+      render(SAMPLE, true, SAMPLE_LIVE);
+      foot.replaceChildren(el("div", null, "QR codes are read on your device. Checks look at the address itself, whether the domain exists and how old it is. Shortened links can't be followed from here, and no check can prove a page is genuine."));
+    }
+    window.addEventListener("hashchange", () => { if (stream && location.hash !== "#qr") stopCam(); });
+    document.addEventListener("visibilitychange", () => { if (document.hidden && stream) stopCam(); });
+    return { mount, classify, urlChecks };
+  })();
+
+
   // ================= Dashboard =================
   const Home = (() => {
     const ART = {
       breach: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="11" width="36" height="26" rx="4"/><path d="M7 13l17 13 17-13"/><circle cx="37" cy="35" r="8" fill="#0a3550" stroke="#ff8b77"/><path d="M37 31v5M37 39v.1" stroke="#ff8b77"/></svg>',
+      qr: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="12" height="12" rx="1.5"/><rect x="29" y="7" width="12" height="12" rx="1.5"/><rect x="7" y="29" width="12" height="12" rx="1.5"/><path d="M29 29h4v4M37 29h4M29 37h4v4M41 35v6h-4"/><path d="M4 24h40" stroke="#6fd59c"/></svg>',
       domain: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 5l15 6v11c0 10-6.5 17-15 21-8.5-4-15-11-15-21V11z"/><rect x="15" y="18" width="18" height="13" rx="2"/><path d="M15.5 19l8.5 6 8.5-6" /></svg>',
       password: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="21" width="30" height="21" rx="4"/><path d="M15 21v-6a9 9 0 0118 0v6"/><circle cx="17" cy="31.5" r="1.6" fill="#21b2e6"/><circle cx="24" cy="31.5" r="1.6" fill="#21b2e6"/><circle cx="31" cy="31.5" r="1.6" fill="#21b2e6"/></svg>',
       website: '<svg viewBox="0 0 48 48" fill="none" stroke="#21b2e6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="38" height="30" rx="4"/><path d="M5 17h38"/><circle cx="10" cy="13" r=".8" fill="#21b2e6"/><circle cx="14" cy="13" r=".8" fill="#21b2e6"/><path d="M17 29l5 5 10-11" stroke="#6fd59c"/></svg>',
@@ -3152,6 +3441,7 @@ X-MS-Exchange-Organization-SCL: 5`;
       { id: "ce", q: "Who's certified, and when is it due?", title: "Cyber Essentials tracker", text: "Track every client's Cyber Essentials and Plus certificates, see renewals coming up and verify on IASME's register.", tags: ["CE", "CE Plus", "Renewals"] },
       { id: "status", q: "Is it them, or is it us?", title: "Service status", text: "Live status for Microsoft 365, TeamViewer, Cloudflare and other services you choose. Anything with a major outage turns red, here and on the Status tab.", tags: ["Microsoft 365", "TeamViewer", "Cloudflare", "Pick your own"], wide: true },
       { id: "watch", q: "What's changed since last time?", title: "My domains", text: "Save the domains you look after on this device, re-check them in one tap and see grade changes and anything about to expire.", tags: ["Saved list", "Re-check all", "Changes"] },
+      { id: "qr", q: "Is this QR code safe to tap?", title: "QR code check", text: "Scan a QR code with the camera or upload a photo to see where it really goes and spot QR phishing before anyone taps it.", tags: ["Camera", "Quishing", "Look-alikes"] },
       { id: "breach", q: "Has my email been leaked?", title: "Breach check", text: "Find out if an email address appears in known data breaches or leaked dumps, what was exposed and when.", tags: ["Breaches", "Paste dumps", "Risk score"] },
       { id: "domain", q: "Can someone send email as me?", title: "Email security check", text: "Tests your domain's SPF, DKIM, DMARC and MTA-STS setup to see whether criminals could impersonate you by email.", tags: ["SPF", "DKIM", "DMARC", "MTA-STS"] },
       { id: "password", q: "Is my password safe?", title: "Password check", text: "Rates how fast a password could be cracked, checks it against a billion leaked passwords privately, and generates strong new ones.", tags: ["Strength", "Leaked lists", "Generator"] },
@@ -3165,8 +3455,8 @@ X-MS-Exchange-Organization-SCL: 5`;
       const a1 = el("a", "solid", "Run a full domain report"); a1.href = "#report"; a1.dataset.route = "report";
       const a2 = el("a", "ghost", "Check an email for breaches"); a2.href = "#breach"; a2.dataset.route = "breach";
       ctas.append(a1, a2);
-      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Fifteen free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Pick a section below to see its tools.", ctas });
-      dial.set({ value: "15", sub: "FREE TOOLS" });
+      const dial = buildHero({ eyebrow: "Steer IT Security Toolkit", title: 'Sixteen free tools. <span class="hl">A few minutes.</span> A clear picture of your IT.', lede: "Run the same quick checks we use when we onboard a new client. Pick a section below to see its tools.", ctas });
+      dial.set({ value: "16", sub: "FREE TOOLS" });
       out.replaceChildren();
       const banner = el("div"); out.append(banner);
       const ceA = CyberEss.alerts();
@@ -3184,7 +3474,7 @@ X-MS-Exchange-Organization-SCL: 5`;
       }).catch(() => {});
       const SECTIONS = [
         { id: "domain", title: "Domain and email", blurb: "Grades, Microsoft 365, email security, headers, DNS, blacklists and renewals", tools: ["report", "watch", "tenant", "domain", "headers", "builder", "blacklist", "website", "dns", "expiry"], art: "report" },
-        { id: "security", title: "Security", blurb: "Leaked accounts, password strength and a password generator", tools: ["breach", "password"], art: "password" },
+        { id: "security", title: "Security", blurb: "QR codes, leaked accounts, password strength and a generator", tools: ["qr", "breach", "password"], art: "password" },
         { id: "network", title: "Services and network", blurb: "Live outages, Cyber Essentials renewals and internet speed", tools: ["status", "ce", "speed"], art: "status" }
       ];
       let open = null; try { open = localStorage.getItem("steer-toolkit-section"); } catch {}
@@ -3222,7 +3512,7 @@ X-MS-Exchange-Organization-SCL: 5`;
   })();
 
   // ================= Router =================
-  const ROUTES = { home: Home, report: Report, breach: Breach, domain: Domain, password: Password, website: Website, dns: Dns, expiry: Expiry, speed: Speed, builder: Builder, blacklist: Blacklist, watch: Watch, status: Status, tenant: Tenant, headers: Headers, ce: CyberEss };
+  const ROUTES = { home: Home, report: Report, breach: Breach, domain: Domain, password: Password, website: Website, dns: Dns, expiry: Expiry, speed: Speed, builder: Builder, blacklist: Blacklist, watch: Watch, status: Status, tenant: Tenant, headers: Headers, ce: CyberEss, qr: QR };
   function go(route, push) {
     if (!ROUTES[route]) route = "home";
     if (route === current) return;
