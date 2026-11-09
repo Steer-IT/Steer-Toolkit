@@ -2,11 +2,11 @@
 
 Free security and IT checks from [Steer IT Solutions](https://steerits.co.uk), built as a single-page web app that can be added to an iPhone Home Screen.
 
-**Domain and email:** Full domain report · My domains · Email security (SPF, DKIM, DMARC, MTA-STS) · Record builder · Blacklist check · Website scan · DNS lookup · Expiry check
+**Domain and email:** Full domain report · My domains · Microsoft 365 tenant lookup · Email security (SPF, DKIM, DMARC, MTA-STS) · Email header analyser · Record builder · Blacklist check · Website scan · DNS lookup · Expiry check
 
-**Security:** Breach check · Password check and generator
+**Security:** QR code check · Breach check · Password check and generator
 
-**Services and network:** Service status (Microsoft 365, TeamViewer, Cloudflare and more) · Speed test with connection details
+**Services and network:** Service status (Microsoft 365, TeamViewer, Cloudflare and more) · Cyber Essentials tracker · Speed test with connection details
 
 ## Hosting
 

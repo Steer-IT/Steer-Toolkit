@@ -1,7 +1,7 @@
 {
   "name": "Steer IT Security Toolkit",
   "short_name": "Steer IT",
-  "description": "Free IT and security checks from Steer IT: service status, full domain report, saved domains, email security, record builder, blacklists, website scan, DNS lookup, expiry check, breach check, password check and speed test.",
+  "description": "Free IT and security checks from Steer IT: QR code check, service status, full domain report, saved domains, Microsoft 365 tenant lookup, email security and header analysis, record builder, blacklists, website scan, DNS lookup, expiry check, Cyber Essentials tracker, breach check, password check and speed test.",
   "id": "./",
   "start_url": "./#home",
   "scope": "./",
@@ -29,16 +29,16 @@
   ],
   "shortcuts": [
     {
+      "name": "QR code check",
+      "url": "./#qr"
+    },
+    {
       "name": "Service status",
       "url": "./#status"
     },
     {
       "name": "Full domain report",
       "url": "./#report"
-    },
-    {
-      "name": "My domains",
-      "url": "./#watch"
     },
     {
       "name": "Speed test",

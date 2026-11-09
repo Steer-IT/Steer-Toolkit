@@ -2881,19 +2881,19 @@ footer a { color: inherit; }
       ]));
       out.append(cta("Phishing getting through? Steer IT can tighten your email filtering and train staff to spot it."));
     }
-    const SAMPLE = `Received: from DB9PR02MB7130.eurprd02.prod.outlook.com (2603:10a6:10:2e5::9) by AM6PR02MB4321.eurprd02.prod.outlook.com with HTTPS; Thu, 22 Oct 2026 09:14:52 +0000
-Received: from DB5PEPF00014B8F.eurprd02.prod.outlook.com (2603:10a6:10:2c4::5) by DB9PR02MB7130.eurprd02.prod.outlook.com (2603:10a6:10:2e5::9) with Microsoft SMTP Server; Thu, 22 Oct 2026 09:14:50 +0000
-Received: from mail.invoice-portal-secure.com (203.0.113.77) by DB5PEPF00014B8F.mail.protection.outlook.com (10.167.8.198) with Microsoft SMTP Server; Thu, 22 Oct 2026 09:14:49 +0000
-Received: from [192.168.1.20] (unknown [198.51.100.14]) by mail.invoice-portal-secure.com (Postfix) with ESMTPSA; Thu, 22 Oct 2026 09:02:11 +0000
-Authentication-Results: spf=softfail (sender IP is 203.0.113.77) smtp.mailfrom=invoice-portal-secure.com; dkim=none (message not signed) header.d=none; dmarc=none action=none header.from=invoice-portal-secure.com; compauth=fail reason=601
-From: "accounts@northbay-accounts.co.uk" <billing@invoice-portal-secure.com>
-Reply-To: northbay.accounts.payments@gmail.com
-Return-Path: billing@invoice-portal-secure.com
-To: finance@harbourside-dental.co.uk
-Subject: Updated bank details - invoice 40281 overdue
+    const SAMPLE = `Received: from MAIL01.example-recipient.test (2001:db8::9) by MAIL02.example-recipient.test with HTTPS; Thu, 22 Oct 2026 09:14:52 +0000
+Received: from EDGE01.example-recipient.test (2001:db8::5) by MAIL01.example-recipient.test with SMTP; Thu, 22 Oct 2026 09:14:50 +0000
+Received: from mail.sender.example (203.0.113.77) by EDGE01.example-recipient.test (10.167.8.198) with SMTP; Thu, 22 Oct 2026 09:14:49 +0000
+Received: from [192.168.1.20] (unknown [198.51.100.14]) by mail.sender.example (Postfix) with ESMTPSA; Thu, 22 Oct 2026 09:02:11 +0000
+Authentication-Results: spf=softfail (sender IP is 203.0.113.77) smtp.mailfrom=sender.example; dkim=none (message not signed) header.d=none; dmarc=none action=none header.from=sender.example; compauth=fail reason=601
+From: "accounts@supplier.example" <billing@sender.example>
+Reply-To: replies@freemail.example
+Return-Path: billing@sender.example
+To: finance@recipient.example
+Subject: Example only: invoice 40281
 Date: Thu, 22 Oct 2026 10:02:09 +0100
-Message-ID: <a81c2e@invoice-portal-secure.com>
-X-Forefront-Antispam-Report: CIP:203.0.113.77;CTRY:NG;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM
+Message-ID: <a81c2e@sender.example>
+X-Forefront-Antispam-Report: CIP:203.0.113.77;CTRY:XX;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM
 X-MS-Exchange-Organization-SCL: 5`;
     function mount() {
       const f = el("form", "search hdr"); f.noValidate = true;

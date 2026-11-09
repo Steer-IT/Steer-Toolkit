@@ -1,6 +1,6 @@
 // Steer IT Security Toolkit: keeps the app itself available offline.
 // Checks (breach, DNS, speed and so on) always go to the live services and are never cached.
-const CACHE = "steer-toolkit-v4";
+const CACHE = "steer-toolkit-v5";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
