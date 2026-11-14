@@ -1,0 +1,124 @@
+{
+  "fetchedAt": "2026-11-14T09:11:51Z",
+  "mac": {
+    "Id": "c07eb1a6-9b09-40fc-aa33-91b8638fb931",
+    "AuthoredDateTime": "2026-11-14T05:42:35+00:00",
+    "InternalDateTime": "2026-11-14T09:03:16+00:00",
+    "LastUpdatedTime": "2026-11-14T09:11:00.7085668+00:00",
+    "Title": "",
+    "Message": "<div>This site is updated when service issues are preventing tenant administrators from accessing Service health in the Microsoft 365 admin center. Alternatively, customers can reference&nbsp;<a target=\"_blank\" href=\"https://www.twitter.com/MSFT365Status\">https://www.twitter.com/MSFT365Status</a>&nbsp;for additional insights into widespread, active incidents.</div>",
+    "Status": "Available"
+  },
+  "consumer": [
+    {
+      "ServiceDisplayName": "Microsoft 365 (Consumer)",
+      "ServiceWorkloadName": "M365Consumer",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T03:51:29.3+00:00",
+      "Title": "Users may be unable to access or perform several actions in Microsoft 365 services",
+      "Message": "User impact: Users may have been unable to access or perform several actions in Microsoft 365 services.\r\n\r\nFinal status: We've confirmed that the services across the previously affected environments have fully recovered and the backlog of email messages has been processed, thus this issue is remediated.\r\n\r\nStart time: Thursday, November 12, 2026, at 10:05 AM UTC\r\n\r\nEnd time: Friday, November 13, 2026, at 4:10 PM UTC\r\n\r\nThis is the final update for the event.",
+      "Status": "Service restored"
+    },
+    {
+      "ServiceDisplayName": "Microsoft Copilot",
+      "ServiceWorkloadName": "CopilotConsumer",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325335+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Microsoft Lists",
+      "ServiceWorkloadName": "ConsumerList",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325335+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Microsoft Teams Free",
+      "ServiceWorkloadName": "TeamsforLife",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325336+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Microsoft To-Do",
+      "ServiceWorkloadName": "microsofttodo",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325337+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Microsoft Whiteboard",
+      "ServiceWorkloadName": "Whiteboard",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325337+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Office for the web (Consumer)",
+      "ServiceWorkloadName": "OfficeOnlineConsumer",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325338+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "OneDrive",
+      "ServiceWorkloadName": "OneDriveConsumer",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.4325339+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Outlook.com",
+      "ServiceWorkloadName": "Outlook.com",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.432534+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    },
+    {
+      "ServiceDisplayName": "Phone Link",
+      "ServiceWorkloadName": "YourPhone",
+      "Id": null,
+      "AuthoredDateTime": "0001-01-01T00:00:00+00:00",
+      "InternalDateTime": "0001-01-01T00:00:00+00:00",
+      "LastUpdatedTime": "2026-11-14T09:11:00.432534+00:00",
+      "Title": "",
+      "Message": "",
+      "Status": "Operational"
+    }
+  ]
+}
